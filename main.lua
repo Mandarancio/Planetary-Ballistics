@@ -25,7 +25,7 @@ function love.load()
 
   bodies[#bodies+1]= player_body
   local speed = universe:orbit_speed(1000,200)
-  bodies[#bodies+1] = Body.create("P2N4", Vec2D.n(0,200),Vec2D.n(speed,0),10,{red=255,blue=100, green=100,alpha=255},10)
+  bodies[#bodies+1] = Body.create("P2N4", Vec2D.n(0,200),Vec2D.n(speed,0),10,{red=255,blue=100, green=100,alpha=255},100)
   universe.bodies= bodies
   screen.w = love.graphics.getWidth()
   screen.h = love.graphics.getHeight()
@@ -58,7 +58,7 @@ function love.draw()
   love.graphics.print('Score : '..player.score,2, bfh+8+2*sfh)
   draw_rockets(player.selected.rockets, smallFont:getWidth(string)+10,bfh+2+2*sfh,4,sfh)
   love.graphics.push()
-  love.graphics.translate(screen.cx+player.selected.position.x, screen.cy-player.selected.position.y)
+  love.graphics.translate(screen.cx-player.selected.position.x, screen.cy-player.selected.position.y)
   for _,body in pairs(universe.bodies) do
     body:draw()
   end

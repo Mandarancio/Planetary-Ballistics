@@ -25,13 +25,24 @@ end
 
 function Phys:update(dt)
 
+  local to_remove={}
   for i = 1,#self.bodies do
     local b1 = self.bodies[i]
-    for j = i+1,#self.bodies,1 do
+    for j = i+1,#self.bodies do
       local b2 = self.bodies[j]
       -- compute distance
       local v = b1.position-b2.position
       local d = v:mod()
+      if (getmetatable(b1) == Body and d<b1.radius) or (getmetatable(b2) == Body and d<b2.radius) then
+        if getmetatable(b1) == getmetatable(b2) then
+          to_remove[#to_remove+1] = i
+          to_remove[#to_remove+1] = j
+        elseif getmetatable(b1) == Body then
+          to_remove[#to_remove+1] = j
+        else
+          to_remove[#to_remove+1] = i
+        end
+      end
       local f = self:gforce(b1,b2)
       -- udpate speed
       -- a = f/m
@@ -48,7 +59,11 @@ function Phys:update(dt)
     -- update position
     -- p = p+s*dt
     -- b1.lasts:add(b1.position)
+    b1:itinerary(b1.position)
     b1.position = b1.position + b1.speed*dt
 
+  end
+  for i=1,#to_remove do
+    table.remove(self.bodies, to_remove[i])
   end
 end
