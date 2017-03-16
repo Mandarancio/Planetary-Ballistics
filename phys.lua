@@ -26,35 +26,65 @@ end
 function Phys:update(dt)
 
   local to_remove={}
+  local to_add ={}
   for i = 1,#self.bodies do
     local b1 = self.bodies[i]
-    for j = i+1,#self.bodies do
-      local b2 = self.bodies[j]
-      -- compute distance
-      local v = b1.position-b2.position
-      local d = v:mod()
-      if (getmetatable(b1) == Body and d<b1.radius) or (getmetatable(b2) == Body and d<b2.radius) then
-        if getmetatable(b1) == getmetatable(b2) then
-          to_remove[#to_remove+1] = i
-          to_remove[#to_remove+1] = j
-        elseif getmetatable(b1) == Body then
-          to_remove[#to_remove+1] = j
-        else
-          to_remove[#to_remove+1] = i
+    if b1.to_remove then
+      to_remove[#to_remove+1] = i
+      ::continue::
+    end
+    for j = 1,#self.bodies do
+      if i~=j then
+        local b2 = self.bodies[j]
+
+        -- compute distance
+        local v = b1.position-b2.position
+        local d = v:mod()
+        if (d<b1.radius) or ( d<b2.radius) then
+          if (getmetatable(b2) == Rocket ) and getmetatable(b1) == Body then
+            local l_to_add = b1:impact(b2.position, b2.speed)
+            b2:target(b1)
+            to_remove[#to_remove+1] = j
+            if b1.points <=0 then
+              to_remove[#to_remove+1] = i
+            end
+            for _,o in pairs(l_to_add) do
+              to_add[#to_add+1] = o
+            end
+          elseif (getmetatable(b1)== Rocket) and getmetatable(b2) == Body then
+            local l_to_add = b2:impact(b1.position, b2.speed)
+            b1:target(b2)
+            to_remove[#to_remove+1] = i
+            if b2.points <=0 then
+              to_remove[#to_remove+1] = j
+            end
+            for _,o in pairs(l_to_add) do
+              to_add[#to_add+1] = o
+            end
+          elseif (getmetatable(b1)== Debris and getmetatable(b2)==Body) then
+            to_remove[#to_remove+1]=i
+          elseif (getmetatable(b2)== Debris and getmetatable(b1)==Body) then
+            to_remove[#to_remove+1]=j
+          else
+            to_remove[#to_remove+1] = i
+            to_remove[#to_remove+1] = j
+          end
+        end
+        if getmetatable(b2) == Body then
+          local f = self:gforce(b1,b2)
+          -- udpate speed
+          -- a = f/m
+          local m_a1 = f/b1.mass
+          -- local m_a2 = f/b2.mass
+          local a1 = -m_a1*v/d
+          -- local a2 = m_a2*v/d
+
+          -- s = s+a*dt
+          b1.speed = b1.speed + a1*dt
+          -- b2.speed = b2.speed + a2*dt
+          -- end
         end
       end
-      local f = self:gforce(b1,b2)
-      -- udpate speed
-      -- a = f/m
-      local m_a1 = f/b1.mass
-      local m_a2 = f/b2.mass
-      local a1 = -m_a1*v/d
-      local a2 = m_a2*v/d
-
-      -- s = s+a*dt
-      b1.speed = b1.speed + a1*dt
-      b2.speed = b2.speed + a2*dt
-      -- end
     end
     -- update position
     -- p = p+s*dt
@@ -65,5 +95,8 @@ function Phys:update(dt)
   end
   for i=1,#to_remove do
     table.remove(self.bodies, to_remove[i])
+  end
+  for _,o in pairs(to_add) do
+    self.bodies[#self.bodies+1] = o
   end
 end

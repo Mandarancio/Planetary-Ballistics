@@ -19,13 +19,17 @@ smallFont = love.graphics.newFont("whitrabt.ttf",16)
 universe = Phys.n(1e2)
 
 function love.load()
-  local player_body = Body.create("P1N2", Vec2D.null(),Vec2D.null(),25,{red=100,blue=100,green=255,alpha=255},1000)
-  player = Player.n("Player",{player_body}, player_body)
+  local player_body = Body.create("P1N2", Vec2D.null(),Vec2D.null(),15,{red=100,blue=100,green=255,alpha=255},1000)
+  local speed = universe:orbit_speed(1000,250)
+
+  local p2 = Body.create("P1N1", Vec2D.n(250,0),Vec2D.n(0,speed),8,{red=100,blue=100, green=255, alpha=255},150)
+  player = Player.n("Player",{player_body, p2}, player_body)
   local bodies = {}
 
   bodies[#bodies+1]= player_body
-  local speed = universe:orbit_speed(1000,200)
-  bodies[#bodies+1] = Body.create("P2N4", Vec2D.n(0,200),Vec2D.n(speed,0),10,{red=255,blue=100, green=100,alpha=255},100)
+  speed = universe:orbit_speed(1000,150)
+  bodies[#bodies+1] = Body.create("P2N4", Vec2D.n(0,150),Vec2D.n(speed,0),6,{red=255,blue=100, green=100,alpha=255},100)
+  bodies[#bodies+1] = p2
   universe.bodies= bodies
   screen.w = love.graphics.getWidth()
   screen.h = love.graphics.getHeight()
@@ -70,10 +74,20 @@ function love.update(dt)
 end
 
 function love.mousepressed(x, y, button, isTouch)
+  local cx = x - screen.cx
+  local cy = y - screen.cy
+  for _,p in pairs(player.bodies) do
+    if p~=nil and p ~= player.selected and p:contains(cx+player.selected.position.x,cy+player.selected.position.y) then
+      player.selected.selected = false
+      p.selected = true
+      player.selected = p
+      return
+    end
+  end
   if player.selected.rockets>0 then
     player.launching.status = true
-    player.launching.x = (x-screen.cx)
-    player.launching.y = (y-screen.cy)
+    player.launching.x = cx
+    player.launching.y = cy
   end
 end
 

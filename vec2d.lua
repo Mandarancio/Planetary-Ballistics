@@ -21,6 +21,12 @@ function Vec2D.n(x,y)
   return Vec2D.create(x,y)
 end
 
+function Vec2D.rand(k)
+  local x = k*2*(math.random()-0.5)
+  local y = k*2*(math.random()-0.5)
+  return Vec2D.create(x,y)
+end
+
 
 function Vec2D:mod()
   return math.sqrt(self.x*self.x + self.y*self.y)
