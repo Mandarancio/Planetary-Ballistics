@@ -32,13 +32,14 @@ function Body.create(name,position, speed, radius, color, mass)
 end
 
 
-
 function Body:draw_launch(x,y)
+  love.graphics.push()
+  love.graphics.scale(1/scale, 1/scale)
   d = x*x+y*y
   if d > self.s_radius then
     a = math.atan2(y, x)
-    x0 = (self.radius+5)*math.cos(a)
-    y0 = (self.radius+5)*math.sin(a)
+    x0 = (self.radius+5)*math.cos(a)*scale
+    y0 = (self.radius+5)*math.sin(a)*scale
 
     if d>22500 then
       x1 = 150 * math.cos(a)
@@ -58,6 +59,7 @@ function Body:draw_launch(x,y)
       love.graphics.line(x0, y0, x, y)
     end
   end
+  love.graphics.pop()
 end
 
 function Body:launch(x,y)
@@ -100,7 +102,7 @@ end
 
 function Body:clicked(x,y)
   if self.points>0 then
-    return (Vec2D.n(x,y)-self.position):mod2()<self.s_radius
+    return (Vec2D.n(x,y)-self.position):mod2()<self.s_radius+9/(scale^2)
   end
   return false
 end
@@ -151,8 +153,7 @@ function Body:impact(obj)
     end
   end
   self.points = self.points - 20*force*100/self.value
-
-  self.mass = (0.5+0.5*self.points/100)*self.tot_mass
+  self.mass = (0.8+0.2*self.points/100)*self.tot_mass
   return to_generate
 end
 
@@ -161,7 +162,7 @@ end
 
 function Body:remove()
   print("Destroy : "..self.name.." : "..self.points)
-  return Debris.n(self.position+Vec2D.rand(5),self.speed+Vec2D.rand(5), self.color, 0.5*self.tot_mass,0.3*self.radius)
+  return DeadPlanet.n(self.position+Vec2D.rand(5),self.speed+Vec2D.rand(5),  0.8*self.tot_mass,0.8*self.radius)
 end
 
 
@@ -229,6 +230,60 @@ end
 function Rocket:remove()
   print('destroy rocket')
   return nil
+end
+
+DeadPlanet = {}
+DeadPlanet.__index = DeadPlanet
+
+function DeadPlanet.n(position, speed, mass, radius)
+  local r = {}
+  setmetatable(r,DeadPlanet)
+
+  r.position = position
+
+  r.speed = speed
+  r.mass = mass
+
+  r.to_remove = false
+
+  r.radius = radius
+  r.s_radius = r.radius^2
+  r.poly = {}
+  local delta = 2*math.pi/9
+  for i=1,9 do
+    local l = r.radius*(math.random()*0.3+0.7)
+    r.poly[#r.poly+1]=math.cos(i*delta)*l
+    r.poly[#r.poly+1]=math.sin(i*delta)*l
+  end
+  return r
+end
+
+function DeadPlanet:itinerary(old)
+end
+
+function DeadPlanet:draw()
+  love.graphics.push()
+  love.graphics.translate(self.position.x, self.position.y)
+  love.graphics.setColor(155,155,155)
+  -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
+  love.graphics.polygon('line',self.poly)
+  love.graphics.pop()
+end
+
+function DeadPlanet:target(b)
+end
+
+function DeadPlanet:remove()
+  print('destroy debris')
+  return nil
+end
+
+function DeadPlanet:contains(pos)
+  local rp = pos-self.position
+  if rp:mod2() < self.s_radius then
+    return PointWithinShape(self.poly, rp.x,rp.y)
+  end
+  return false
 end
 
 Debris = {}
