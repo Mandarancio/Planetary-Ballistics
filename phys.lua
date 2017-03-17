@@ -51,7 +51,7 @@ function Phys:update(dt)
         local d = v:mod()
         if ((d<b1.radius) or ( d<b2.radius)) and (b1:contains(b2.position) or b2:contains(b1.position)) then
           if (getmetatable(b2) == Rocket ) and getmetatable(b1) == Body then
-            local l_to_add = b1:impact(b2.position, b2.speed)
+            local l_to_add = b1:impact(b2)
             b2:target(b1)
             to_remove[#to_remove+1] = b2
             if b1.points <=0 then
@@ -61,7 +61,7 @@ function Phys:update(dt)
               to_add[#to_add+1] = o
             end
           elseif (getmetatable(b1)== Rocket) and getmetatable(b2) == Body then
-            local l_to_add = b2:impact(b1.position, b2.speed)
+            local l_to_add = b2:impact(b1)
             b1:target(b2)
             to_remove[#to_remove+1] = b1
             if b2.points <=0 then
@@ -72,10 +72,10 @@ function Phys:update(dt)
             end
           elseif (getmetatable(b1)== Debris and getmetatable(b2)==Body) then
             to_remove[#to_remove+1]=b1
-            b2:impact(b1.position, b1.speed)
+            b2:impact(b1)
           elseif (getmetatable(b2)== Debris and getmetatable(b1)==Body) then
             to_remove[#to_remove+1]=b2
-            b1:impact(b2.position, b2.speed)
+            b1:impact(b2)
           else
             to_remove[#to_remove+1] = b1
             to_remove[#to_remove+1] = b2

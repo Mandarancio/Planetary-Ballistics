@@ -55,8 +55,8 @@ function love.draw()
   local bfh = bigFont:getHeight()
   local sfh = smallFont:getHeight()
   love.graphics.setFont(bigFont)
-  love.graphics.print(player.name..' : '..player:points()..'%',2,bfh)
-  local string = 'Planet : '..player.selected.name..' ('..player.selected.points..'%)'
+  love.graphics.print(player.name..' : '..string.format("%.2f",player:points())..'%',2,bfh)
+  local string = 'Planet : '..player.selected.name..' ('..string.format("%.2f",player.selected.points)..'%)'
   love.graphics.setFont(smallFont)
   love.graphics.print(string, 2,bfh+4+sfh)
   love.graphics.print('Score : '..player.score,2, bfh+8+2*sfh)

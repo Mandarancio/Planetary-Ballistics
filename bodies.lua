@@ -114,7 +114,14 @@ function Body:contains(pos)
   return false
 end
 
-function Body:impact(pos,speed)
+function Body:impact(obj)
+  local pos = obj.position
+  local speed = obj.speed
+  local force = 1
+  if getmetatable(obj) == Debris then
+    force = obj.radius/10
+  end
+
   local max = 20
   for i=1,20 do
     local x = self.poly[i*2-1]
@@ -123,22 +130,23 @@ function Body:impact(pos,speed)
     local v = Vec2D.n(x+self.position.x,y+self.position.y)
     local d = (v-pos):mod2()
     if d<max then
-      local int = 0.5*(1-math.abs(d/max))
-      local lr = (1 - int +(math.random()-0.5)*0.1)*math.sqrt(x*x+y*y)
+      local int = 0.2*(1-math.abs(d/max))*force
+      local lr = (1 - int +(math.random()-0.5)*0.08)*math.sqrt(x*x+y*y)
       self.poly[i*2-1]= lr*math.cos(i*math.pi/10)
       self.poly[i*2]= lr*math.sin(i*math.pi/10)
     end
   end
   local d = math.random(2,5)
   local to_generate = {}
-  local base = (math.random()*0.2+0.3)*speed:mod()
+  local base = -(math.random()*0.2+0.1)*speed:mod()
   local ip = self.position-pos
-  local a = math.atan2(ip.y,ip.x)
-  local vbase = base*Vec2D.n(math.cos(a), math.sin(a))
+  local vbase = base/5*ip
   for i=1,d do
-    to_generate[i] = Debris.n(pos+vbase*0.05+Vec2D.rand(10),self.speed+vbase+Vec2D.rand(5), self.color)
+    to_generate[i] = Debris.n(pos+vbase*0.1+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color)
   end
-  self.points = self.points - 10*100/self.value
+
+  self.points = self.points - 20*force*100/self.value
+
   self.mass = self.points/100*self.tot_mass
   return to_generate
 end
@@ -160,7 +168,7 @@ function Rocket.n(position, speed, origin)
   r.max_histo = 80
   r.radius=0
   r.speed = speed
-  r.mass = 1
+  r.mass = 1e-2
   r.owner = origin.player
   r.origin = origin
   r.__itinerary={position}
@@ -225,10 +233,10 @@ function Debris.n(position, speed , color)
   r.max_life = 1500
   r.life =0
   r.speed = speed
-  r.mass = 1
+  r.mass = 1e-2
   r.color = color
   r.to_remove = false
-  r.radius = math.random()*3
+  r.radius = math.random()*1
   r.s_radius = r.radius^2
   r.poly = {}
   local delta = 2*math.pi/5
