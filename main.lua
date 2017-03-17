@@ -36,7 +36,7 @@ function love.load()
   screen.h = love.graphics.getHeight()
   screen.cx = screen.w/2
   screen.cy = screen.h/2
-  print(screen.w..'x'..screen.h)
+  -- rint(screen.w..'x'..screen.h)
   bg = love.graphics.newImage("bg.png")
 end
 

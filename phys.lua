@@ -81,7 +81,7 @@ function Phys:update(dt)
             to_remove[#to_remove+1] = b2
           end
         end
-        if getmetatable(b2) == Body then
+        if getmetatable(b2) == Body or getmetatable(b2) == Debris then
           local f = self:gforce(b1,b2)
           -- udpate speed
           -- a = f/m
@@ -105,8 +105,15 @@ function Phys:update(dt)
 
   end
   for i=1,#to_remove do
-    -- to_remove[i]:remove()
-    table.remove(self.bodies, find(self.bodies,to_remove[i]))
+    local toi = find(self.bodies,to_remove[i])
+    if to_remove[i]~=nil and toi ~=nil then
+
+      local rest = to_remove[i]:remove()
+      table.remove(self.bodies, toi )
+      if rest~= nil then
+        to_add[#to_add+1]=rest
+      end
+    end
   end
   for _,o in pairs(to_add) do
     self.bodies[#self.bodies+1] = o

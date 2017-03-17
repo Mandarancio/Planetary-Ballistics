@@ -72,7 +72,6 @@ function Body:launch(x,y)
     if m>150 then
       s = s*150/m
     end
-    print(s:mod())
     return Rocket.n(Vec2D.n(x0,y0)+self.position, s+self.speed, self)
   end
   return nil
@@ -141,25 +140,31 @@ function Body:impact(obj)
   local to_generate = {}
 
   if scale == 1 then
+    local mass =10
     local d = math.random(2,9)
+    mass = mass /d
     local base = -(math.random()*0.2+0.1)*speed:mod()
     local ip = self.position-pos
     local vbase = base/5*ip
     for i=1,d do
-      to_generate[i] = Debris.n(pos+vbase*0.07+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color)
+      to_generate[i] = Debris.n(pos+vbase*0.07+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color, mass)
     end
   end
   self.points = self.points - 20*force*100/self.value
 
-  self.mass = self.points/100*self.tot_mass
+  self.mass = (0.5+0.5*self.points/100)*self.tot_mass
   return to_generate
 end
 
 function Body:itinerary(old)
 end
-function Body:destroy()
+
+function Body:remove()
   print("Destroy : "..self.name.." : "..self.points)
+  return Debris.n(self.position+Vec2D.rand(5),self.speed+Vec2D.rand(5), self.color, 0.5*self.tot_mass,0.3*self.radius)
 end
+
+
 Rocket = {}
 Rocket.__index = Rocket
 
@@ -223,13 +228,14 @@ end
 
 function Rocket:remove()
   print('destroy rocket')
+  return nil
 end
 
 Debris = {}
 Debris.__index = Debris
 
 
-function Debris.n(position, speed , color)
+function Debris.n(position, speed , color, mass, radius)
   local r = {}
   setmetatable(r,Debris)
 
@@ -237,10 +243,14 @@ function Debris.n(position, speed , color)
   r.max_life = 1500
   r.life =0
   r.speed = speed
-  r.mass = 1e-2
+  r.mass = mass
   r.color = color
   r.to_remove = false
-  r.radius = math.random()*1
+  if radius == nil then
+    r.radius = math.random()*1
+  else
+    r.radius = radius
+  end
   r.s_radius = r.radius^2
   r.poly = {}
   local delta = 2*math.pi/5
@@ -273,6 +283,7 @@ end
 
 function Debris:remove()
   print('destroy debris')
+  return nil
 end
 
 function Debris:contains(pos)
