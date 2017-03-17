@@ -14,6 +14,7 @@ function Player.n(name, bodies, selected)
   end
   p.score = 0
   selected.selected = true
+
   p.launching = {
     status = false,
     x = 0,
@@ -66,13 +67,16 @@ function PlayerAI:update(dt)
   self.t = self.t +dt
   if self.t > self.launching.t+3+2*math.random() then
     self.launching.t = self.t
-    if self.selected==nil or self.selected.rockets <= 0 or self.selected.points <=0  or math.random()>0.7 then
+    if self.selected==nil or
+     self.selected.rockets <= 0 or
+     self.selected.points <=0  or
+     math.random()>0.7 then
       self:switch_selected()
     end
     if self.selected~=nil and self.selected.rockets >0 and self.selected.points>0 then
       local target = self:select_target(self.selected)
       if target~=nil then
-        local v = (target.position-self.selected.position)+(target.speed-self.selected.speed) + Vec2D.rand(20)
+        local v = (target.position-self.selected.position)+(target.speed-self.selected.speed) + Vec2D.rand(10)
         v = (0.3+math.random()*0.7)*max_rocekt_speed*v/v:mod()
         return self.selected:launch(v.x,v.y)
       end
@@ -87,7 +91,9 @@ function PlayerAI:switch_selected()
   for _,p in pairs(self.bodies) do
     if p.points> 0 and math.random()< mp then
       p.selected = true
-      self.selected.selected = false
+      if self.selected~=nil  then
+        self.selected.selected = false
+      end
       self.selected = p
       return
     end

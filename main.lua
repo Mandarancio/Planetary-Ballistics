@@ -20,23 +20,51 @@ smallFont = love.graphics.newFont("whitrabt.ttf",16)
 universe = Phys.n(1e2)
 bg = nil
 
+function shallowcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do
+            copy[orig_key] = orig_value
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 
 function love.load()
-  local d = 1000
-  local speed = 0 -- universe:orbit_speed(1e6,d)
-  local player_body = Body.create("P1N2", Vec2D.n(0,d),Vec2D.n(speed,0),15,{red=100,blue=100,green=255,alpha=255},1000)
-  local lspeed = universe:orbit_speed(1000,320)
-  local p2 = Body.create("P1N1", Vec2D.n(0,d+300),Vec2D.n(speed+lspeed,0),5,{red=100,blue=100, green=255, alpha=255},90)
-  player = Player.n("Player",{player_body, p2}, player_body)
-  -- speed = universe:orbit_speed(1000,150)
-  lspeed = universe:orbit_speed(1000,220)
-  local p3 = Body.create("P2N4", Vec2D.n(220,d),Vec2D.n(speed,-lspeed),8,{red=255,blue=100, green=100,alpha=255},100)
-  ai = PlayerAI.n("AI", {p3}, p3, player)
-  local bodies = {}
+  sys = generate_system(2,2)
+  -- local d = 1000
+  -- local speed = 0 -- universe:orbit_speed(1e6,d)
+  -- local player_body = Body.create("P1N2", Vec2D.n(0,d),Vec2D.n(speed,0),15,{red=100,blue=100,green=255,alpha=255},1000)
+  -- local lspeed = universe:orbit_speed(1000,320)
+  -- local p2 = Body.create("P1N1", Vec2D.n(0,d+300),Vec2D.n(speed+lspeed,0),5,{red=100,blue=100, green=255, alpha=255},90)
+  -- player = Player.n("Player",{player_body, p2}, player_body)
+  -- -- speed = universe:orbit_speed(1000,150)
+  -- lspeed = universe:orbit_speed(1000,220)
+  -- local p3 = Body.create("P2N4", Vec2D.n(220,d),Vec2D.n(speed,-lspeed),8,{red=255,blue=100, green=100,alpha=255},100)
+  -- ai = PlayerAI.n("AI", {p3}, p3, player)
+   local bodies = {}
+  --
+  -- bodies[#bodies+1]= player_body
+  -- bodies[#bodies+1] = p3
+  -- bodies[#bodies+1] = p2 --Star.n(Vec2D.null(),1e6,50)
+  print(sys.player[1])
+  player = Player.n("Player", shallowcopy(sys.player), sys.player[1])
+  ai = PlayerAI.n("AI", shallowcopy(sys).ai, player)
+  for _,p in pairs(sys.player) do
+    bodies[#bodies+1]=p
+  end
 
-  bodies[#bodies+1]= player_body
-  bodies[#bodies+1] = p3
-  bodies[#bodies+1] = p2 --Star.n(Vec2D.null(),1e6,50)
+  for _,p in pairs(sys.ai) do
+    bodies[#bodies+1]=p
+  end
+  player.selected= sys.player[1]
+  ai.selected = sys.ai[1]
+  ai.enemy = player
   universe.bodies= bodies
   screen.w = love.graphics.getWidth()
   screen.h = love.graphics.getHeight()
@@ -61,7 +89,6 @@ end
 
 function love.draw()
   love.graphics.setColor(100, 255, 100, 255)
-
   love.graphics.draw(bg, 0, 0)
   local bfh = bigFont:getHeight()
   local sfh = smallFont:getHeight()
