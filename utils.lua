@@ -10,7 +10,7 @@ function generate_system(N,M )
   }
   local player_color = {red=100,green = 255, blue = 100 , alpha = 255}
   local ai_color = {red=255, green = 100, blue=100, alpha =255}
-  local central_body_mass = math.random(1000,2000)
+  local central_body_mass = math.random(3000,5000)
   local min_radius = 4
   local max_radius = 20
   local min_dist = 90

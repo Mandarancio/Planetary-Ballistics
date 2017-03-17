@@ -1,6 +1,6 @@
 require("geotest")
 
-max_rocekt_speed = 150
+max_rocekt_speed = 300
 
 Body = {}
 Body.__index = Body
