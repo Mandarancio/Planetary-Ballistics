@@ -118,8 +118,10 @@ function Body:impact(obj)
   local pos = obj.position
   local speed = obj.speed
   local force = 1
+  local scale = 1
   if getmetatable(obj) == Debris then
     force = obj.radius/10
+    scale = obj.radius
   end
 
   local max = 20
@@ -130,21 +132,23 @@ function Body:impact(obj)
     local v = Vec2D.n(x+self.position.x,y+self.position.y)
     local d = (v-pos):mod2()
     if d<max then
-      local int = 0.2*(1-math.abs(d/max))*force
+      local int = 0.2*(1-math.abs(d/max))*scale
       local lr = (1 - int +(math.random()-0.5)*0.08)*math.sqrt(x*x+y*y)
       self.poly[i*2-1]= lr*math.cos(i*math.pi/10)
       self.poly[i*2]= lr*math.sin(i*math.pi/10)
     end
   end
-  local d = math.random(2,5)
   local to_generate = {}
-  local base = -(math.random()*0.2+0.1)*speed:mod()
-  local ip = self.position-pos
-  local vbase = base/5*ip
-  for i=1,d do
-    to_generate[i] = Debris.n(pos+vbase*0.1+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color)
-  end
 
+  if scale == 1 then
+    local d = math.random(2,9)
+    local base = -(math.random()*0.2+0.1)*speed:mod()
+    local ip = self.position-pos
+    local vbase = base/5*ip
+    for i=1,d do
+      to_generate[i] = Debris.n(pos+vbase*0.07+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color)
+    end
+  end
   self.points = self.points - 20*force*100/self.value
 
   self.mass = self.points/100*self.tot_mass

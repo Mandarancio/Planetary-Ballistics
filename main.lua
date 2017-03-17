@@ -17,6 +17,7 @@ player = nil
 bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
 universe = Phys.n(1e2)
+bg = nil
 
 function love.load()
   local player_body = Body.create("P1N2", Vec2D.null(),Vec2D.null(),15,{red=100,blue=100,green=255,alpha=255},1000)
@@ -35,6 +36,8 @@ function love.load()
   screen.h = love.graphics.getHeight()
   screen.cx = screen.w/2
   screen.cy = screen.h/2
+  print(screen.w..'x'..screen.h)
+  bg = love.graphics.newImage("bg.png")
 end
 
 function draw_rocket(x,y,w,h)
@@ -52,6 +55,8 @@ end
 
 function love.draw()
   love.graphics.setColor(100, 255, 100, 255)
+
+  love.graphics.draw(bg, 0, 0)
   local bfh = bigFont:getHeight()
   local sfh = smallFont:getHeight()
   love.graphics.setFont(bigFont)
