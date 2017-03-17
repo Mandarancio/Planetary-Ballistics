@@ -51,7 +51,7 @@ function Phys:update(dt)
         local v = b1.position-b2.position
         local d = v:mod()
         self:collision_manager(b1,b2,d,to_remove,to_add)
-        if getmetatable(b2) == Body or getmetatable(b2) == Debris then
+        if b2.mass > 10 then
           local f = self:gforce(b1,b2)
           -- udpate speed
           -- a = f/m
@@ -118,8 +118,12 @@ function Phys:collision_manager(a,b,d, to_remove, to_add)
       to_remove[#to_remove+1]=b
       a:impact(b)
     else
-      to_remove[#to_remove+1] = a
-      to_remove[#to_remove+1] = b
+      if getmetatable(a)~=Star then
+        to_remove[#to_remove+1] = a
+      end
+      if getmetatable(b)~=Star then
+        to_remove[#to_remove+1] = b
+      end
     end
   end
 end

@@ -1,5 +1,7 @@
 require("geotest")
 
+max_rocekt_speed = 300
+
 Body = {}
 Body.__index = Body
 
@@ -41,9 +43,9 @@ function Body:draw_launch(x,y)
     x0 = (self.radius+5)*math.cos(a)*scale
     y0 = (self.radius+5)*math.sin(a)*scale
 
-    if d>22500 then
-      x1 = 150 * math.cos(a)
-      y1 = 150 * math.sin(a)
+    if d>max_rocekt_speed^2 then
+      x1 = max_rocekt_speed * math.cos(a)
+      y1 = max_rocekt_speed * math.sin(a)
 
       love.graphics.setColor(255, 255, 255, 50)
       love.graphics.line(x1,y1,x,y)
@@ -71,8 +73,8 @@ function Body:launch(x,y)
     local y0 = (self.radius+5)*math.sin(a)
     local s = Vec2D.n(x,y)
     local m = s:mod()
-    if m>150 then
-      s = s*150/m
+    if m>max_rocekt_speed then
+      s = s*max_rocekt_speed/m
     end
     return Rocket.n(Vec2D.n(x0,y0)+self.position, s+self.speed, self, self.color)
   end
@@ -194,7 +196,7 @@ end
 function Rocket:draw()
   love.graphics.push()
   love.graphics.translate(self.position.x, self.position.y)
-  love.graphics.rotate(math.atan2(self.speed.y, self.speed.x))
+  love.graphics.rotate(math.atan2(self.speed.y-self.origin.speed.y, self.speed.x-self.origin.speed.x))
   love.graphics.setColor(self.color.red,self.color.green,self.color.blue)
   love.graphics.polygon('line',self.poly)
   love.graphics.pop()
@@ -217,7 +219,7 @@ function Rocket:itinerary(old)
   self.life = self.life + 1
   if self.life >= self.max_life then
     self.to_remove = true
-  end 
+  end
   if (old-self.__itinerary[#self.__itinerary]):mod2() >=100 then
     if #self.__itinerary>self.max_histo then
       table.remove(self.__itinerary,1)
