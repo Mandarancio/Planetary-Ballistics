@@ -1,3 +1,4 @@
+require("geotest")
 
 Body = {}
 Body.__index = Body
@@ -13,6 +14,7 @@ function Body.create(name,position, speed, radius, color, mass)
   cb.radius = radius
   cb.s_radius = radius*radius
   cb.mass = mass
+  cb.tot_mass =mass
   cb.points = 100
   cb.rockets = 10
   cb.selected = false
@@ -21,7 +23,7 @@ function Body.create(name,position, speed, radius, color, mass)
   cb.to_remove = false
   cb.poly = {}
   local delta = 2*math.pi/20
-  for i=1,21 do
+  for i=1,20 do
     cb.poly[#cb.poly+1]=math.cos(i*delta)*radius
     cb.poly[#cb.poly+1]=math.sin(i*delta)*radius
   end
@@ -79,9 +81,16 @@ end
 function Body:draw()
   love.graphics.push()
   love.graphics.translate(self.position.x, self.position.y)
-  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, self.color.alpha)
+
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue,100)
+  love.graphics.circle('line', 0, 0, self.radius+1, 2*self.radius)
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue,255)
+  -- love.graphics.line(0,0,self.speed.x,self.speed.y)
   -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
-  love.graphics.line(self.poly)
+ love.graphics.polygon('line',self.poly)
+
+
+
   if self.selected then
     if self.player.launching.status then
       self:draw_launch(self.player.launching.x, self.player.launching.y)
@@ -90,16 +99,24 @@ function Body:draw()
   love.graphics.pop()
 end
 
-function Body:contains(x,y)
+function Body:clicked(x,y)
   if self.points>0 then
     return (Vec2D.n(x,y)-self.position):mod2()<self.s_radius
   end
   return false
 end
 
+function Body:contains(pos)
+  local rp = pos-self.position
+  if rp:mod2() < self.s_radius then
+    return PointWithinShape(self.poly, rp.x,rp.y)
+  end
+  return false
+end
+
 function Body:impact(pos,speed)
   local max = 20
-  for i=1,21 do
+  for i=1,20 do
     local x = self.poly[i*2-1]
     local y = self.poly[i*2]
 
@@ -107,24 +124,30 @@ function Body:impact(pos,speed)
     local d = (v-pos):mod2()
     if d<max then
       local int = 0.5*(1-math.abs(d/max))
-      local lr = (1 - int +(math.random()-0.5)*0.3)*math.sqrt(x*x+y*y)
+      local lr = (1 - int +(math.random()-0.5)*0.1)*math.sqrt(x*x+y*y)
       self.poly[i*2-1]= lr*math.cos(i*math.pi/10)
       self.poly[i*2]= lr*math.sin(i*math.pi/10)
     end
   end
   local d = math.random(2,5)
   local to_generate = {}
-  local base = -(math.random()*0.2+0.2)*speed
+  local base = (math.random()*0.2+0.3)*speed:mod()
+  local ip = self.position-pos
+  local a = math.atan2(ip.y,ip.x)
+  local vbase = base*Vec2D.n(math.cos(a), math.sin(a))
   for i=1,d do
-    to_generate[i] = Debris.n(pos+base*0.2+Vec2D.rand(10),self.speed+base+Vec2D.rand(5), self.color)
+    to_generate[i] = Debris.n(pos+vbase*0.05+Vec2D.rand(10),self.speed+vbase+Vec2D.rand(5), self.color)
   end
-  self.points = self.points - 20
+  self.points = self.points - 10*100/self.value
+  self.mass = self.points/100*self.tot_mass
   return to_generate
 end
 
 function Body:itinerary(old)
 end
-
+function Body:destroy()
+  print("Destroy : "..self.name.." : "..self.points)
+end
 Rocket = {}
 Rocket.__index = Rocket
 
@@ -142,6 +165,7 @@ function Rocket.n(position, speed, origin)
   r.origin = origin
   r.__itinerary={position}
   r.to_remove = false
+  r.poly = {-4,2, 2,2,4,0,2,-2,-4,-2}
   return r
 end
 
@@ -150,7 +174,7 @@ function Rocket:draw()
   love.graphics.translate(self.position.x, self.position.y)
   love.graphics.rotate(math.atan2(self.speed.y, self.speed.x))
   love.graphics.setColor(255,255,255,255)
-  love.graphics.line(-4,2, 2,2,4,0,2,-2,-4,-2,-4,2)
+  love.graphics.polygon('line',self.poly)
   love.graphics.pop()
   local alpha = (self.max_histo-#self.__itinerary)*(100/self.max_histo)
   for i=1,#self.__itinerary do
@@ -163,6 +187,9 @@ function Rocket:draw()
   end
 end
 
+function Rocket:contains(pos)
+  return false
+end
 
 function Rocket:itinerary(old)
   if (old-self.__itinerary[#self.__itinerary]):mod2() >=100 then
@@ -182,6 +209,10 @@ function Rocket:target(b)
   end
 end
 
+function Rocket:remove()
+  print('destroy rocket')
+end
+
 Debris = {}
 Debris.__index = Debris
 
@@ -198,11 +229,13 @@ function Debris.n(position, speed , color)
   r.color = color
   r.to_remove = false
   r.radius = math.random()*3
+  r.s_radius = r.radius^2
   r.poly = {}
   local delta = 2*math.pi/5
-  for i=1,6 do
-    r.poly[#r.poly+1]=math.cos(i*delta)*r.radius
-    r.poly[#r.poly+1]=math.sin(i*delta)*r.radius
+  for i=1,5 do
+    local l = r.radius*(math.random()*0.3+0.7)
+    r.poly[#r.poly+1]=math.cos(i*delta)*l
+    r.poly[#r.poly+1]=math.sin(i*delta)*l
   end
   return r
 end
@@ -219,9 +252,21 @@ function Debris:draw()
   love.graphics.translate(self.position.x, self.position.y)
   love.graphics.setColor(self.color.red, self.color.green, self.color.blue, self.color.alpha)
   -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
-  love.graphics.line(self.poly)
+  love.graphics.polygon('line',self.poly)
   love.graphics.pop()
 end
 
 function Debris:target(b)
+end
+
+function Debris:remove()
+  print('destroy debris')
+end
+
+function Debris:contains(pos)
+  local rp = pos-self.position
+  if rp:mod2() < self.s_radius then
+    return PointWithinShape(self.poly, rp.x,rp.y)
+  end
+  return false
 end

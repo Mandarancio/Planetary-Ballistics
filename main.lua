@@ -12,7 +12,7 @@ screen ={
   cy = 0
 }
 
-
+scale = 1
 player = nil
 bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
@@ -63,6 +63,7 @@ function love.draw()
   draw_rockets(player.selected.rockets, smallFont:getWidth(string)+10,bfh+2+2*sfh,4,sfh)
   love.graphics.push()
   love.graphics.translate(screen.cx-player.selected.position.x, screen.cy-player.selected.position.y)
+  love.graphics.scale(scale, scale)
   for _,body in pairs(universe.bodies) do
     body:draw()
   end
@@ -74,10 +75,10 @@ function love.update(dt)
 end
 
 function love.mousepressed(x, y, button, isTouch)
-  local cx = x - screen.cx
-  local cy = y - screen.cy
+  local cx = (x - screen.cx)/scale
+  local cy = (y - screen.cy)/scale
   for _,p in pairs(player.bodies) do
-    if p~=nil and p ~= player.selected and p:contains(cx+player.selected.position.x,cy+player.selected.position.y) then
+    if p~=nil and p ~= player.selected and p:clicked(cx+player.selected.position.x,cy+player.selected.position.y) then
       player.selected.selected = false
       p.selected = true
       player.selected = p
@@ -93,15 +94,15 @@ end
 
 function love.mousemoved(x, y, dx, dy)
   if player.launching.status then
-    player.launching.x = (x-screen.cx)
-    player.launching.y = (y-screen.cy)
+    player.launching.x = (x-screen.cx)/scale
+    player.launching.y = (y-screen.cy)/scale
   end
 end
 
 function love.mousereleased(x, y, button, isTouch)
   if player.launching.status then
     player.launching.status = false
-    local r = player.selected:launch((x-screen.cx),(y-screen.cy))
+    local r = player.selected:launch((x-screen.cx)/scale,(y-screen.cy)/scale)
     if r~=nil then
       universe.bodies[#universe.bodies+1]=r
     end
