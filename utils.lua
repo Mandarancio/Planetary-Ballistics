@@ -36,7 +36,7 @@ function generate_system(N,M )
     local speed = universe:orbit_speed(central_body_mass,d)
     local a = math.random()*2*math.pi
     local pos = Vec2D.n(d*math.cos(a),d*math.sin(a))
-    local spe = Vec2D.n(speed*math.sin(a), speed*math.cos(a))
+    local spe = Vec2D.n(-speed*math.sin(a), speed*math.cos(a))
     system.ai[i]= Body.create("P2"..i.."N",pos,spe,r,ai_color,mass)
   end
   return system
