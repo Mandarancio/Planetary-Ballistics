@@ -1,6 +1,6 @@
 require("geotest")
 
-max_rocekt_speed = 300
+max_rocekt_speed = 150
 
 Body = {}
 Body.__index = Body
@@ -24,6 +24,7 @@ function Body.create(name,position, speed, radius, color, mass)
   cb.player = nil
   cb.to_remove = false
   cb.poly = {}
+  cb.create = 0
   local delta = 2*math.pi/20
   for i=1,20 do
     cb.poly[#cb.poly+1]=math.cos(i*delta)*radius
@@ -74,7 +75,7 @@ function Body:launch(x,y)
     local s = Vec2D.n(x,y)
     local m = s:mod()
     if m>max_rocekt_speed then
-      s = s*max_rocekt_speed/m
+      s = s*max_rocekt_speed*1.5/m
     end
     return Rocket.n(Vec2D.n(x0,y0)+self.position, s+self.speed, self, self.color)
   end
@@ -154,18 +155,29 @@ function Body:impact(obj)
       to_generate[i] = Debris.n(pos+vbase*0.07+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color, mass)
     end
   end
-  self.points = self.points - 20*force*100/self.value
+  self.points = self.points - 20
   self.mass = (0.8+0.2*self.points/100)*self.tot_mass
   return to_generate
 end
 
 function Body:itinerary(old)
+  if self.rockets<10 then
+    self.create = self.create+1
+    if self.create == 1000 then
+      self.create = 0
+      self.rockets = self.rockets+1
+    end
+  end
 end
 
 function Body:remove()
   print("Destroy : "..self.name.." : "..self.points)
-  self.selected = false
+  if self.selected then
+    self.selected = false
+    self.player.selected = nil
+  end
   self.points = 0
+
   return DeadPlanet.n(self.position,self.speed,self.mass,self.radius,self.poly)
 end
 

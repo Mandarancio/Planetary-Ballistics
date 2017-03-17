@@ -85,6 +85,12 @@ function draw_rockets(num, x,y, w,h)
     draw_rocket(x,y,w,h)
     x = x+w+ts
   end
+  if player.selected.create>0 then
+    local hh = h*player.selected.create/1000
+    love.graphics.rectangle('fill', x, y-hh, w, hh)
+    love.graphics.rectangle('line', x, y-hh, w, hh)
+
+  end
 end
 
 function love.draw()
@@ -94,15 +100,25 @@ function love.draw()
   local sfh = smallFont:getHeight()
   love.graphics.setFont(bigFont)
   love.graphics.print(player.name..' : '..string.format("%.2f",player:points())..'%',2,bfh)
-  local string = 'Planet : '..player.selected.name..' ('..string.format("%.2f",player.selected.points)..'%)'
+  local string = 'Planet : '
+  if player.selected ~= nil then
+    string = string .. player.selected.name..' ('..string.format("%.2f",player.selected.points)..'%)'
+  else
+    string = string .. " - "
+  end
   love.graphics.setFont(smallFont)
   love.graphics.print(string, 2,bfh+4+sfh)
   love.graphics.print('Score : '..player.score,2, bfh+8+2*sfh)
-  draw_rockets(player.selected.rockets, smallFont:getWidth(string)+10,bfh+2+2*sfh,4,sfh)
+  if player.selected~=nil then
+    draw_rockets(player.selected.rockets, smallFont:getWidth(string)+10,bfh+2+2*sfh,4,sfh)
+  end
   love.graphics.push()
   love.graphics.translate(screen.cx, screen.cy)
   love.graphics.scale(scale, scale)
-  love.graphics.translate(-player.selected.position.x, - player.selected.position.y)
+  if player.selected~=nil then
+
+    love.graphics.translate(-player.selected.position.x, - player.selected.position.y)
+  end
   for _,body in pairs(universe.bodies) do
     body:draw()
   end
@@ -130,7 +146,7 @@ function love.mousepressed(x, y, button, isTouch)
         return
       end
     end
-    if player.selected.rockets>0 then
+    if player.selected~=nil and player.selected.rockets>0 then
       player.launching.status = true
       player.launching.x = cx*scale
       player.launching.y = cy*scale
@@ -148,7 +164,7 @@ function love.mousemoved(x, y, dx, dy)
 end
 
 function love.mousereleased(x, y, button, isTouch)
-  if button == 1 and player.launching.status then
+  if button == 1 and player.launching.status and player.selected~=nil then
     player.launching.status = false
     local r = player.selected:launch((x-screen.cx)/scale,(y-screen.cy)/scale)
     if r~=nil then
