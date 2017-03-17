@@ -14,6 +14,7 @@ screen ={
 
 scale = 1
 player = nil
+ai = nil
 bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
 universe = Phys.n(1e2)
@@ -22,14 +23,15 @@ bg = nil
 function love.load()
   local player_body = Body.create("P1N2", Vec2D.null(),Vec2D.null(),15,{red=100,blue=100,green=255,alpha=255},1000)
   local speed = universe:orbit_speed(1000,250)
-
   local p2 = Body.create("P1N1", Vec2D.n(250,0),Vec2D.n(0,speed),8,{red=100,blue=100, green=255, alpha=255},150)
   player = Player.n("Player",{player_body, p2}, player_body)
+  speed = universe:orbit_speed(1000,150)
+  local p3 = Body.create("P2N4", Vec2D.n(0,150),Vec2D.n(speed,0),6,{red=255,blue=100, green=100,alpha=255},100)
+  ai = PlayerAI.n("AI", {p3}, p3, player)
   local bodies = {}
 
   bodies[#bodies+1]= player_body
-  speed = universe:orbit_speed(1000,150)
-  bodies[#bodies+1] = Body.create("P2N4", Vec2D.n(0,150),Vec2D.n(speed,0),6,{red=255,blue=100, green=100,alpha=255},100)
+  bodies[#bodies+1] = p3
   bodies[#bodies+1] = p2
   universe.bodies= bodies
   screen.w = love.graphics.getWidth()
@@ -77,6 +79,11 @@ end
 
 function love.update(dt)
   universe:update(dt)
+  local r = ai:update(dt)
+  if r~=nil then
+      universe.bodies[#universe.bodies+1]=r
+  end
+
 end
 
 function love.mousepressed(x, y, button, isTouch)
