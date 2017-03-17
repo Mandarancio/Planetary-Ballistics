@@ -72,8 +72,8 @@ function PlayerAI:update(dt)
     if self.selected~=nil and self.selected.rockets >0 then
       local target = self:select_target(self.selected)
       if target~=nil then
-        local v = (target.position-self.selected.position)+(target.speed-self.selected.speed)
-        v = 150*v/v:mod()
+        local v = (target.position-self.selected.position)+(target.speed-self.selected.speed) + Vec2D.rand(40)
+        v = (0.4+math.random()*0.6)*150*v/v:mod()
         return self.selected:launch(v.x,v.y)
       end
     end
@@ -103,7 +103,7 @@ function PlayerAI:select_target(o)
   local d = 1000
   for _,p in pairs(self.enemy.bodies) do
     local vd =  (o.position-p.position)
-    if selected == nil or (p.points>0 and vd:mod2() < d) then
+    if p.points>0  and (selected == nil or vd:mod2() < d) then
       d=vd:mod2()
       selected = p
     end

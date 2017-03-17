@@ -72,7 +72,7 @@ function Body:launch(x,y)
     if m>150 then
       s = s*150/m
     end
-    return Rocket.n(Vec2D.n(x0,y0)+self.position, s+self.speed, self)
+    return Rocket.n(Vec2D.n(x0,y0)+self.position, s+self.speed, self, self.color)
   end
   return nil
 end
@@ -169,10 +169,10 @@ Rocket = {}
 Rocket.__index = Rocket
 
 
-function Rocket.n(position, speed, origin)
+function Rocket.n(position, speed, origin, color)
   local r = {}
   setmetatable(r,Rocket)
-
+  r.color = color
   r.position = position
   r.max_histo = 80
   r.radius=0
@@ -190,7 +190,7 @@ function Rocket:draw()
   love.graphics.push()
   love.graphics.translate(self.position.x, self.position.y)
   love.graphics.rotate(math.atan2(self.speed.y, self.speed.x))
-  love.graphics.setColor(255,255,255,255)
+  love.graphics.setColor(self.color.red,self.color.green,self.color.blue)
   love.graphics.polygon('line',self.poly)
   love.graphics.pop()
   local alpha = (self.max_histo-#self.__itinerary)*(100/self.max_histo)
