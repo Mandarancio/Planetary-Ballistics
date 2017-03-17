@@ -69,7 +69,7 @@ function PlayerAI:update(dt)
     if self.selected==nil or self.selected.rockets <= 0 or self.selected.points <=0  or math.random()>0.7 then
       self:switch_selected()
     end
-    if self.selected~=nil and self.selected.rockets >0 then
+    if self.selected~=nil and self.selected.rockets >0 and self.selected.points>0 then
       local target = self:select_target(self.selected)
       if target~=nil then
         local v = (target.position-self.selected.position)+(target.speed-self.selected.speed) + Vec2D.rand(40)
