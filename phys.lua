@@ -38,6 +38,7 @@ function Phys:update(dt)
   local to_add ={}
   for i = 1,#self.bodies do
     local b1 = self.bodies[i]
+    local old_speed= 1*b1.speed
     if b1.to_remove then
       to_remove[#to_remove+1] = b1
       ::continue::
@@ -49,38 +50,7 @@ function Phys:update(dt)
         -- compute distance
         local v = b1.position-b2.position
         local d = v:mod()
-        if ((d<b1.radius) or ( d<b2.radius)) and (b1:contains(b2.position) or b2:contains(b1.position)) then
-          if (getmetatable(b2) == Rocket ) and getmetatable(b1) == Body then
-            local l_to_add = b1:impact(b2)
-            b2:target(b1)
-            to_remove[#to_remove+1] = b2
-            if b1.points <=0 then
-              to_remove[#to_remove+1] = b1
-            end
-            for _,o in pairs(l_to_add) do
-              to_add[#to_add+1] = o
-            end
-          elseif (getmetatable(b1)== Rocket) and getmetatable(b2) == Body then
-            local l_to_add = b2:impact(b1)
-            b1:target(b2)
-            to_remove[#to_remove+1] = b1
-            if b2.points <=0 then
-              to_remove[#to_remove+1] = b2
-            end
-            for _,o in pairs(l_to_add) do
-              to_add[#to_add+1] = o
-            end
-          elseif (getmetatable(b1)== Debris and getmetatable(b2)==Body) then
-            to_remove[#to_remove+1]=b1
-            b2:impact(b1)
-          elseif (getmetatable(b2)== Debris and getmetatable(b1)==Body) then
-            to_remove[#to_remove+1]=b2
-            b1:impact(b2)
-          else
-            to_remove[#to_remove+1] = b1
-            to_remove[#to_remove+1] = b2
-          end
-        end
+        self:collision_manager(b1,b2,d,to_remove,to_add)
         if getmetatable(b2) == Body or getmetatable(b2) == Debris then
           local f = self:gforce(b1,b2)
           -- udpate speed
@@ -101,8 +71,7 @@ function Phys:update(dt)
     -- p = p+s*dt
     -- b1.lasts:add(b1.position)
     b1:itinerary(b1.position)
-    b1.position = b1.position + b1.speed*dt
-
+    b1.position = b1.position + (b1.speed+old_speed)*dt/2
   end
   for i=1,#to_remove do
     local toi = find(self.bodies,to_remove[i])
@@ -117,5 +86,40 @@ function Phys:update(dt)
   end
   for _,o in pairs(to_add) do
     self.bodies[#self.bodies+1] = o
+  end
+end
+
+function Phys:collision_manager(a,b,d, to_remove, to_add)
+  if ((d<a.radius) or ( d<b.radius)) and (a:contains(b.position) or b:contains(a.position)) then
+    if (getmetatable(b) == Rocket ) and getmetatable(a) == Body then
+      local l_to_add = a:impact(b)
+      b:target(a)
+      to_remove[#to_remove+1] = b
+      if a.points <=0 then
+        to_remove[#to_remove+1] = a
+      end
+      for _,o in pairs(l_to_add) do
+        to_add[#to_add+1] = o
+      end
+    elseif (getmetatable(a)== Rocket) and getmetatable(b) == Body then
+      local l_to_add = b:impact(a)
+      a:target(b)
+      to_remove[#to_remove+1] = a
+      if b.points <=0 then
+        to_remove[#to_remove+1] = b
+      end
+      for _,o in pairs(l_to_add) do
+        to_add[#to_add+1] = o
+      end
+    elseif (getmetatable(a)== Debris and b.mass>1e1) then
+      to_remove[#to_remove+1]=a
+      b:impact(a)
+    elseif (getmetatable(b)== Debris and a.mass>1e1) then
+      to_remove[#to_remove+1]=b
+      a:impact(b)
+    else
+      to_remove[#to_remove+1] = a
+      to_remove[#to_remove+1] = b
+    end
   end
 end

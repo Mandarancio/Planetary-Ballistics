@@ -142,7 +142,7 @@ function Body:impact(obj)
   local to_generate = {}
 
   if scale == 1 then
-    local mass =10
+    local mass =1
     local d = math.random(2,9)
     mass = mass /d
     local base = -(math.random()*0.2+0.1)*speed:mod()
@@ -162,7 +162,9 @@ end
 
 function Body:remove()
   print("Destroy : "..self.name.." : "..self.points)
-  return DeadPlanet.n(self.position+Vec2D.rand(5),self.speed+Vec2D.rand(5),  0.8*self.tot_mass,0.8*self.radius)
+  self.selected = false
+  self.points = 0
+  return DeadPlanet.n(self.position,self.speed,self.mass,self.radius,self.poly)
 end
 
 
@@ -184,6 +186,8 @@ function Rocket.n(position, speed, origin, color)
   r.__itinerary={position}
   r.to_remove = false
   r.poly = {-4,2, 2,2,4,0,2,-2,-4,-2}
+  r.life = 0
+  r.max_life = 1000
   return r
 end
 
@@ -210,6 +214,10 @@ function Rocket:contains(pos)
 end
 
 function Rocket:itinerary(old)
+  self.life = self.life + 1
+  if self.life >= self.max_life then
+    self.to_remove = true
+  end 
   if (old-self.__itinerary[#self.__itinerary]):mod2() >=100 then
     if #self.__itinerary>self.max_histo then
       table.remove(self.__itinerary,1)
@@ -235,7 +243,7 @@ end
 DeadPlanet = {}
 DeadPlanet.__index = DeadPlanet
 
-function DeadPlanet.n(position, speed, mass, radius)
+function DeadPlanet.n(position, speed, mass, radius , poly)
   local r = {}
   setmetatable(r,DeadPlanet)
 
@@ -248,13 +256,8 @@ function DeadPlanet.n(position, speed, mass, radius)
 
   r.radius = radius
   r.s_radius = r.radius^2
-  r.poly = {}
-  local delta = 2*math.pi/9
-  for i=1,9 do
-    local l = r.radius*(math.random()*0.3+0.7)
-    r.poly[#r.poly+1]=math.cos(i*delta)*l
-    r.poly[#r.poly+1]=math.sin(i*delta)*l
-  end
+  r.poly = poly
+
   return r
 end
 
@@ -274,7 +277,7 @@ function DeadPlanet:target(b)
 end
 
 function DeadPlanet:remove()
-  print('destroy debris')
+  print('destroy DeadPlanet ? Why?')
   return nil
 end
 
@@ -286,11 +289,48 @@ function DeadPlanet:contains(pos)
   return false
 end
 
+function DeadPlanet:impact(obj)
+  local pos = obj.position
+  local speed = obj.speed
+  local force = 1
+  local scale = 1
+  if getmetatable(obj) == Debris then
+    force = obj.radius/10
+    scale = obj.radius
+  end
+
+  local max = #self.poly/2
+  for i=1,max do
+    local x = self.poly[i*2-1]
+    local y = self.poly[i*2]
+
+    local v = Vec2D.n(x+self.position.x,y+self.position.y)
+    local d = (v-pos):mod2()
+    if d<max then
+      local int = 0.2*(1-math.abs(d/max))*scale
+      local lr = (1 - int +(math.random()-0.5)*0.08)*math.sqrt(x*x+y*y)
+      self.poly[i*2-1]= lr*math.cos(i*math.pi/10)
+      self.poly[i*2]= lr*math.sin(i*math.pi/10)
+    end
+  end
+  local to_generate = {}
+
+  local mass =1
+  local d = math.random(2,9)
+  local base = -(math.random()*0.2+0.1)*speed:mod()
+  local ip = self.position-pos
+  local vbase = base/5*ip
+  for i=1,d do
+    to_generate[i] = Debris.n(pos+vbase*0.07+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color, mass)
+  end
+  return to_generate
+end
+
 Debris = {}
 Debris.__index = Debris
 
 
-function Debris.n(position, speed , color, mass, radius)
+function Debris.n(position, speed , color, mass)
   local r = {}
   setmetatable(r,Debris)
 
@@ -301,19 +341,11 @@ function Debris.n(position, speed , color, mass, radius)
   r.mass = mass
   r.color = color
   r.to_remove = false
-  if radius == nil then
-    r.radius = math.random()*1
-  else
-    r.radius = radius
-  end
-  r.s_radius = r.radius^2
-  r.poly = {}
+  r.radius = 0.5
+
+  r.s_radius = 0.25
   local delta = 2*math.pi/5
-  for i=1,5 do
-    local l = r.radius*(math.random()*0.3+0.7)
-    r.poly[#r.poly+1]=math.cos(i*delta)*l
-    r.poly[#r.poly+1]=math.sin(i*delta)*l
-  end
+
   return r
 end
 
@@ -329,7 +361,7 @@ function Debris:draw()
   love.graphics.translate(self.position.x, self.position.y)
   love.graphics.setColor(self.color.red, self.color.green, self.color.blue, self.color.alpha)
   -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
-  love.graphics.polygon('line',self.poly)
+  love.graphics.points(0,0)
   love.graphics.pop()
 end
 
@@ -337,14 +369,58 @@ function Debris:target(b)
 end
 
 function Debris:remove()
-  print('destroy debris')
+  --- print('destroy debris')
   return nil
 end
 
 function Debris:contains(pos)
   local rp = pos-self.position
-  if rp:mod2() < self.s_radius then
-    return PointWithinShape(self.poly, rp.x,rp.y)
-  end
-  return false
+  return rp:mod2() < self.s_radius
+end
+
+
+Star = {}
+Star.__index = Star
+
+
+function Star.n(position , mass, radius)
+  local r = {}
+  setmetatable(r,Star)
+
+  r.position = position
+
+  r.speed = Vec2D.null()
+  r.mass = mass
+  r.color = {red=255,green=255,blue=100}
+  r.to_remove = false
+  r.radius = radius
+  r.s_radius = r.radius^2
+  return r
+end
+
+function Star:itinerary(old)
+end
+
+function Star:draw()
+  love.graphics.push()
+  love.graphics.translate(self.position.x, self.position.y)
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, 150)
+  love.graphics.circle('fill', 0, 0, self.radius, self.radius*2)
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, 255)
+  love.graphics.circle('line', 0, 0, self.radius, self.radius*2)
+
+  love.graphics.pop()
+end
+
+function Star:target(b)
+end
+
+function Star:remove()
+  --- print('destroy debris')
+  return nil
+end
+
+function Star:contains(pos)
+  local rp = pos-self.position
+  return rp:mod2() < self.s_radius
 end

@@ -93,7 +93,7 @@ function PlayerAI:switch_selected()
     end
     pp = pp+mp
   end
-  if self.selected.points == 0 then
+  if self.selected ~= nil and self.selected.points == 0 then
     self.selected = nil
   end
 end

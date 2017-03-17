@@ -89,20 +89,24 @@ function love.update(dt)
 end
 
 function love.mousepressed(x, y, button, isTouch)
-  local cx = (x - screen.cx)/scale
-  local cy = (y - screen.cy)/scale
-  for _,p in pairs(player.bodies) do
-    if p~=nil and p ~= player.selected and p.points > 0 and p:clicked(cx+player.selected.position.x,cy+player.selected.position.y) then
-      player.selected.selected = false
-      p.selected = true
-      player.selected = p
-      return
+  if button == 1 then
+    local cx = (x - screen.cx)/scale
+    local cy = (y - screen.cy)/scale
+    for _,p in pairs(player.bodies) do
+      if p~=nil and p ~= player.selected and p.points > 0 and p:clicked(cx+player.selected.position.x,cy+player.selected.position.y) then
+        player.selected.selected = false
+        p.selected = true
+        player.selected = p
+        return
+      end
     end
-  end
-  if player.selected.rockets>0 then
-    player.launching.status = true
-    player.launching.x = cx*scale
-    player.launching.y = cy*scale
+    if player.selected.rockets>0 then
+      player.launching.status = true
+      player.launching.x = cx*scale
+      player.launching.y = cy*scale
+    end
+  elseif button == 2 and   player.launching.status then
+    player.launching.status = false
   end
 end
 
@@ -114,7 +118,7 @@ function love.mousemoved(x, y, dx, dy)
 end
 
 function love.mousereleased(x, y, button, isTouch)
-  if player.launching.status then
+  if button == 1 and player.launching.status then
     player.launching.status = false
     local r = player.selected:launch((x-screen.cx)/scale,(y-screen.cy)/scale)
     if r~=nil then
