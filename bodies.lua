@@ -258,7 +258,6 @@ function Rocket:remove()
   print('destroy rocket')
   -- print(self.life)
   if self.life >= self.max_life then
-    print "hereeee"
     local d={}
     local N = math.random(4,10)
     for i =1,N do
