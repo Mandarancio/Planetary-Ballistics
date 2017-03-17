@@ -36,7 +36,9 @@ end
 
 
 function love.load()
-  sys = generate_system(2,2)
+  math.randomseed( os.time() )
+
+  sys = generate_system(3,2)
   -- local d = 1000
   -- local speed = 0 -- universe:orbit_speed(1e6,d)
   -- local player_body = Body.create("P1N2", Vec2D.n(0,d),Vec2D.n(speed,0),15,{red=100,blue=100,green=255,alpha=255},1000)

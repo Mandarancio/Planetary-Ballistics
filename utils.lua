@@ -15,8 +15,8 @@ function generate_system(N,M )
   local max_radius = 20
   local min_dist = 90
   local max_dist = 500
-  local min_mass = 10
-  local max_mass = 20
+  local min_mass = 90
+  local max_mass = 200
   system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius-min_radius, max_radius), player_color, central_body_mass)
   max_radius = 10
   for i=2,N do

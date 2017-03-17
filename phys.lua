@@ -80,7 +80,9 @@ function Phys:update(dt)
       local rest = to_remove[i]:remove()
       table.remove(self.bodies, toi )
       if rest~= nil then
-        to_add[#to_add+1]=rest
+        for _,p in pairs(rest) do
+          to_add[#to_add+1]=p
+        end
       end
     end
   end
@@ -111,17 +113,22 @@ function Phys:collision_manager(a,b,d, to_remove, to_add)
       for _,o in pairs(l_to_add) do
         to_add[#to_add+1] = o
       end
-    elseif (getmetatable(a)== Debris and b.mass>1e1) then
+    elseif (getmetatable(a)== Debris) then
       to_remove[#to_remove+1]=a
       b:impact(a)
-    elseif (getmetatable(b)== Debris and a.mass>1e1) then
+    elseif (getmetatable(b)== Debris) then
       to_remove[#to_remove+1]=b
       a:impact(b)
     else
-      if getmetatable(a)~=Star then
+      if (getmetatable(a)==getmetatable(b) and getmetatable(a)==DeadPlanet) then
+        a:impact(b)
+        b:impact(a)
+        a.speed = (a.speed+b.speed)/2+Vec2D.rand(a.speed:mod()/2)
+        b.speed = (a.speed+b.speed)/2+Vec2D.rand(b.speed:mod()/2)
+        a.position = a.position+Vec2D.rand(10)
+        b.position = b.position+Vec2D.rand(10)
+      else
         to_remove[#to_remove+1] = a
-      end
-      if getmetatable(b)~=Star then
         to_remove[#to_remove+1] = b
       end
     end

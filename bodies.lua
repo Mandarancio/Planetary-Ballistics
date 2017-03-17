@@ -178,7 +178,7 @@ function Body:remove()
   end
   self.points = 0
 
-  return DeadPlanet.n(self.position,self.speed,self.mass,self.radius,self.poly)
+  return {DeadPlanet.n(self.position,self.speed,self.mass,self.radius,self.poly)}
 end
 
 
@@ -227,6 +227,11 @@ function Rocket:contains(pos)
   return false
 end
 
+function Rocket:impact(pos)
+  self.to_remove =true
+  return {}
+end
+
 function Rocket:itinerary(old)
   self.life = self.life + 1
   if self.life >= self.max_life then
@@ -251,6 +256,16 @@ end
 
 function Rocket:remove()
   print('destroy rocket')
+  -- print(self.life)
+  if self.life >= self.max_life then
+    print "hereeee"
+    local d={}
+    local N = math.random(4,10)
+    for i =1,N do
+       d[#d+1] = Debris.n(self.position+Vec2D.rand(5),self.speed+Vec2D.rand(30), self.color, 1)
+    end
+    return d
+  end
   return nil
 end
 
@@ -380,6 +395,11 @@ function Debris:draw()
 end
 
 function Debris:target(b)
+end
+
+function Debris:impact(pos)
+  self.to_remove= true
+  return {}
 end
 
 function Debris:remove()
