@@ -19,6 +19,7 @@ bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
 universe = Phys.n(1e2)
 bg = nil
+pause = false
 
 function shallowcopy(orig)
     local orig_type = type(orig)
@@ -37,6 +38,7 @@ end
 
 function love.load()
   math.randomseed( os.time() )
+  love.window.setTitle( "Orbital Ballistics" )
 
   sys = generate_system(3,2)
   -- local d = 1000
@@ -125,24 +127,45 @@ function love.draw()
     body:draw()
   end
   love.graphics.pop()
+  if pause then
+    love.graphics.setColor(0,0,0,180)
+    love.graphics.rectangle('fill', 0, 0, screen.w, screen.h)
+    love.graphics.setColor(255,255,255)
+    
+    love.graphics.setFont(bigFont)
+    local string="Pause"
+    local w = bigFont:getWidth(string)
+    love.graphics.print(string,screen.cx-w/2,screen.cy+sfh/2)
+    
+  end
 end
 
 function love.update(dt)
-  universe:update(dt)
-  local r = ai:update(dt)
-  if r~=nil then
-      universe.bodies[#universe.bodies+1]=r
+  if not pause then
+    universe:update(dt)
+    local r = ai:update(dt)
+    if r~=nil then
+        universe.bodies[#universe.bodies+1]=r
+    end
   end
-
 end
 
 function love.mousepressed(x, y, button, isTouch)
+  if pause then
+    return
+  end
   if button == 1 then
     local cx = (x - screen.cx)/scale
     local cy = (y - screen.cy)/scale
+    if player.selected~= nil then
+      cx = cx +player.selected.position.x
+      cy = cy + player.selected.position.y
+    end
     for _,p in pairs(player.bodies) do
-      if p~=nil and p ~= player.selected and p.points > 0 and p:clicked(cx+player.selected.position.x,cy+player.selected.position.y) then
-        player.selected.selected = false
+      if p~=nil and p ~= player.selected and p.points>0 and p:clicked(cx,cy) then
+        if player.selected ~= nil then
+          player.selected.selected = false
+        end
         p.selected = true
         player.selected = p
         return
@@ -150,8 +173,8 @@ function love.mousepressed(x, y, button, isTouch)
     end
     if player.selected~=nil and player.selected.rockets>0 then
       player.launching.status = true
-      player.launching.x = cx*scale
-      player.launching.y = cy*scale
+      player.launching.x = (x - screen.cx)
+      player.launching.y =  (y - screen.cy)
     end
   elseif button == 2 and   player.launching.status then
     player.launching.status = false
@@ -159,6 +182,9 @@ function love.mousepressed(x, y, button, isTouch)
 end
 
 function love.mousemoved(x, y, dx, dy)
+  if pause then
+    return
+  end
   if player.launching.status then
     player.launching.x = (x-screen.cx)
     player.launching.y = (y-screen.cy)
@@ -166,6 +192,9 @@ function love.mousemoved(x, y, dx, dy)
 end
 
 function love.mousereleased(x, y, button, isTouch)
+  if pause then
+    return
+  end
   if button == 1 and player.launching.status and player.selected~=nil then
     player.launching.status = false
     local r = player.selected:launch((x-screen.cx)/scale,(y-screen.cy)/scale)
@@ -184,7 +213,13 @@ function love.keypressed(key, scancode, isrepeat)
     if scale > 1/32 then
       scale = scale/2
     end
+  elseif key == 'escape' then
+    pause = not pause
+    if pause then
+      player.launching.status =false
+    end
   end
+  
 end
 
 function love.keyreleased(key)
