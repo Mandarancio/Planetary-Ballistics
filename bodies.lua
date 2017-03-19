@@ -156,6 +156,10 @@ function Body:impact(obj)
     end
   end
   self.points = self.points - 20
+  if self.points <= 0 then
+    self.to_remove = true
+    self.points = 0
+  end
   self.mass = (0.8+0.2*self.points/100)*self.tot_mass
   return to_generate
 end
@@ -177,7 +181,7 @@ function Body:remove()
     self.player.selected = nil
   end
   self.points = 0
-
+   
   return {DeadPlanet.n(self.position,self.speed,self.mass,self.radius,self.poly)}
 end
 

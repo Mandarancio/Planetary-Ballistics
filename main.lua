@@ -20,6 +20,8 @@ smallFont = love.graphics.newFont("whitrabt.ttf",16)
 universe = Phys.n(1e2)
 bg = nil
 pause = true
+gameover = false
+winner = ''
 
 function shallowcopy(orig)
     local orig_type = type(orig)
@@ -127,10 +129,24 @@ function love.draw()
     body:draw()
   end
   love.graphics.pop()
-  if pause then
+  if gameover then
     love.graphics.setColor(0,0,0,180)
     love.graphics.rectangle('fill', 0, 0, screen.w, screen.h)
     love.graphics.setColor(255,255,255)
+    love.graphics.setFont(bigFont)
+    local string="Game Over"
+    local w = bigFont:getWidth(string)
+    love.graphics.print(string,screen.cx-w/2,screen.cy-bfh/2)
+    string = "The Winner is: "..winner.."!"
+    w = smallFont:getWidth(string)
+    love.graphics.setFont(smallFont)
+    love.graphics.print(string,screen.cx-w/2,screen.cy+bfh/2+sfh/2)
+
+  elseif pause then
+    love.graphics.setColor(0,0,0,180)
+    love.graphics.rectangle('fill', 0, 0, screen.w, screen.h)
+    love.graphics.setColor(255,255,255)
+
     
     love.graphics.setFont(bigFont)
     local string="Pause"
@@ -140,15 +156,24 @@ function love.draw()
     w = smallFont:getWidth(string)
     love.graphics.setFont(smallFont)
     love.graphics.print(string,screen.cx-w/2,screen.cy+bfh/2+sfh/2)
+  
   end
+  
 end
 
 function love.update(dt)
-  if not pause then
+  if not pause and not gameover then
     universe:update(dt)
     local r = ai:update(dt)
     if r~=nil then
         universe.bodies[#universe.bodies+1]=r
+    end
+    if player:points()==0 then
+	gameover = true
+	winner = ai.name
+    elseif ai:points()==0 then 
+	gameover = true
+	winner = player.name
     end
   end
 end
