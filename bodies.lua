@@ -35,7 +35,7 @@ function Body.create(name,position, speed, radius, color, mass)
 end
 
 
-function Body:draw_launch(x,y)
+function Body:draw_launch(x,y, scale)
   love.graphics.push()
   love.graphics.scale(1/scale, 1/scale)
   d = x*x+y*y
@@ -82,7 +82,7 @@ function Body:launch(x,y)
   return nil
 end
 
-function Body:draw()
+function Body:draw(scale)
   love.graphics.push()
   love.graphics.translate(self.position.x, self.position.y)
 
@@ -97,13 +97,13 @@ function Body:draw()
 
   if self.selected then
     if self.player.launching.status then
-      self:draw_launch(self.player.launching.x, self.player.launching.y)
+      self:draw_launch(self.player.launching.x, self.player.launching.y,scale)
     end
   end
   love.graphics.pop()
 end
 
-function Body:clicked(x,y)
+function Body:clicked(x,y,scale)
   if self.points>0 then
     return (Vec2D.n(x,y)-self.position):mod2()<self.s_radius+9/(scale^2)
   end
