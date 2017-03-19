@@ -179,7 +179,7 @@ function love.update(dt)
 end
 
 function love.mousepressed(x, y, button, isTouch)
-  if pause then
+  if pause or gameover then
     return
   end
   if button == 1 then
@@ -210,7 +210,7 @@ function love.mousepressed(x, y, button, isTouch)
 end
 
 function love.mousemoved(x, y, dx, dy)
-  if pause then
+  if pause or gameover then
     return
   end
   if player.launching.status then
@@ -220,7 +220,7 @@ function love.mousemoved(x, y, dx, dy)
 end
 
 function love.mousereleased(x, y, button, isTouch)
-  if pause then
+  if pause or gameover then
     return
   end
   if button == 1 and player.launching.status and player.selected~=nil then

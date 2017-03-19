@@ -123,7 +123,8 @@ function Body:impact(obj)
   local speed = obj.speed
   local force = 1
   local scale = 1
-  if getmetatable(obj) == Debris then
+  local type = getmetatable(obj)
+  if type == Debris then
     force = obj.radius/10
     scale = obj.radius
   end
@@ -154,7 +155,13 @@ function Body:impact(obj)
       to_generate[i] = Debris.n(pos+vbase*0.07+Vec2D.rand(10),self.speed*0.8+vbase*0.2+Vec2D.rand(5), self.color, mass)
     end
   end
-  self.points = self.points - 20
+  if type == Rocket then
+    self.points = self.points - 20
+  elseif type == Body or type==DeadPlanet then
+    self.points = 0
+  else
+    self.points = self.points -2 
+  end
   if self.points <= 0 then
     self.to_remove = true
     self.points = 0
