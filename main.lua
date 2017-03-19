@@ -41,7 +41,7 @@ function love.load()
   screen.h = love.graphics.getHeight()
   screen.cx = screen.w/2
   screen.cy = screen.h/2
-  game = Game.new("Player",2,2,true)
+  game = Game.new("Player",2,3,true)
 end
 
 

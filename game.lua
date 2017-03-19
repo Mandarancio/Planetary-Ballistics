@@ -83,12 +83,12 @@ function Game:init()
   local system = nil
   if self.player_center then
     system = self:generate_system(self.n_player, self.n_ai)
-    self.player = Player.n(self.player_name, system.player, system.player[1])
-    self.ai = PlayerAI.n("AI", system.ai, system.ai[1], self.player)
+    self.player = Player.n(self.player_name, system.player, system.player[math.random(1, self.n_player)])
+    self.ai = PlayerAI.n("AI", system.ai, system.ai[math.random(1, self.n_ai)], self.player)
   else
     system = self:generate_system(self.n_ai, self.n_player)
-    self.player = Player.n(self.player_name, system.ai, system.ai[1])
-    self.ai = PlayerAI.n("AI", system.player, system.player[1], self.player)
+    self.player = Player.n(self.player_name, system.ai, system.ai[math.random(1, self.n_player)])
+    self.ai = PlayerAI.n("AI", system.player, system.player[math.random(1, self.n_ai)], self.player)
   end
   for _,p in pairs(system.player) do
     self.universe.bodies[#self.universe.bodies+1]=p
