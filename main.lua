@@ -19,7 +19,7 @@ bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
 universe = Phys.n(1e2)
 bg = nil
-pause = false
+pause = true
 
 function shallowcopy(orig)
     local orig_type = type(orig)
@@ -135,8 +135,11 @@ function love.draw()
     love.graphics.setFont(bigFont)
     local string="Pause"
     local w = bigFont:getWidth(string)
-    love.graphics.print(string,screen.cx-w/2,screen.cy+sfh/2)
-    
+    love.graphics.print(string,screen.cx-w/2,screen.cy-bfh/2)
+    string = "Press ESC to resume"
+    w = smallFont:getWidth(string)
+    love.graphics.setFont(smallFont)
+    love.graphics.print(string,screen.cx-w/2,screen.cy+bfh/2+sfh/2)
   end
 end
 
