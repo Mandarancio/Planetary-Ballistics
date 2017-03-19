@@ -147,7 +147,6 @@ function Body:impact(obj)
   if scale == 1 then
     local mass =1
     local d = math.random(2,9)
-    mass = mass /d
     local base = -(math.random()*0.2+0.1)*speed:mod()
     local ip = self.position-pos
     local vbase = base/5*ip
@@ -160,7 +159,6 @@ function Body:impact(obj)
     self.to_remove = true
     self.points = 0
   end
-  self.mass = (0.8+0.2*self.points/100)*self.tot_mass
   return to_generate
 end
 
