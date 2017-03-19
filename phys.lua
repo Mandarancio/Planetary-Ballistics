@@ -92,8 +92,17 @@ function Phys:update(dt)
 end
 
 function Phys:collision_manager(a,b,d, to_remove, to_add)
+  local atype = getmetatable(a)
+  local btype = getmetatable(b)
+  if atype==btype and atype== Rocket then
+    if (a.position-b.position):mod2()<25 then
+      to_remove[#to_remove+1] = a
+      to_remove[#to_remove+1] = b
+    end
+    return
+  end
   if ((d<a.radius) or ( d<b.radius)) and (a:contains(b.position) or b:contains(a.position)) then
-    if (getmetatable(b) == Rocket ) and getmetatable(a) == Body then
+    if btype == Rocket  and atype == Body then
       local l_to_add = a:impact(b)
       b:target(a)
       to_remove[#to_remove+1] = b
@@ -103,7 +112,7 @@ function Phys:collision_manager(a,b,d, to_remove, to_add)
       for _,o in pairs(l_to_add) do
         to_add[#to_add+1] = o
       end
-    elseif (getmetatable(a)== Rocket) and getmetatable(b) == Body then
+    elseif atype== Rocket and btype == Body then
       local l_to_add = b:impact(a)
       a:target(b)
       to_remove[#to_remove+1] = a
@@ -113,14 +122,14 @@ function Phys:collision_manager(a,b,d, to_remove, to_add)
       for _,o in pairs(l_to_add) do
         to_add[#to_add+1] = o
       end
-    elseif (getmetatable(a)== Debris) then
+    elseif (atype== Debris) then
       to_remove[#to_remove+1]=a
       b:impact(a)
-    elseif (getmetatable(b)== Debris) then
+    elseif (btype== Debris) then
       to_remove[#to_remove+1]=b
       a:impact(b)
     else
-      if (getmetatable(a)==getmetatable(b) and getmetatable(a)==DeadPlanet) then
+      if (atype==btype and atype==DeadPlanet) then
         a:impact(b)
         b:impact(a)
         a.speed = (a.speed+b.speed)/2+Vec2D.rand(a.speed:mod()/2)

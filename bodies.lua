@@ -160,7 +160,7 @@ function Body:impact(obj)
   elseif type == Body or type==DeadPlanet then
     self.points = 0
   else
-    self.points = self.points -2 
+    self.points = self.points -2
   end
   if self.points <= 0 then
     self.to_remove = true
@@ -186,7 +186,7 @@ function Body:remove()
     self.player.selected = nil
   end
   self.points = 0
-   
+
   return {DeadPlanet.n(self.position,self.speed,self.mass,self.radius,self.poly)}
 end
 
@@ -314,8 +314,9 @@ function DeadPlanet:target(b)
 end
 
 function DeadPlanet:remove()
-  print('destroy DeadPlanet ? Why?')
-  return nil
+  -- print('destroy DeadPlanet ? Why?')
+  self.position = self.position + Vec2D.rand(2)
+  return {self}
 end
 
 function DeadPlanet:contains(pos)
