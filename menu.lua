@@ -6,7 +6,7 @@ function Menu.new()
   setmetatable(m,Menu)
   m.logo = love.graphics.newImage("logo.png")
   m.selected = 1
-  m.items = {'New Game', 'High Scores', 'Commands'}
+  m.items = {'Planetary System', 'Solar System', 'Commands'}
   return m
 end
 
@@ -43,8 +43,11 @@ end
 function Menu:exec(value)
   print(value)
   if value == 1 then
-    game =  Game.new("Player",2,3,true)
+    game =  Game.new("Player",2,3,true, false)
     in_game= true
+  elseif value == 2 then
+    game = Game.new("Player",4,4,true, true)
+    in_game = true
   end
 end
 

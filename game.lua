@@ -6,46 +6,68 @@ require("vec2d")
 Game  ={}
 Game.__index = Game
 
-function Game:generate_system(N,M)
+function Game:generate_system(N,M, sun)
   local system = {
     player ={},
-    ai = {}
+    ai = {},
+    bodies = {}
   }
   local player_color = {red=100,green = 255, blue = 100 , alpha = 255}
   local ai_color = {red=255, green = 100, blue=100, alpha =255}
-  local central_body_mass = math.random(3000,5000)
-  local min_radius = 4
-  local max_radius = 20
-  local min_dist = 90
-  local max_dist = 500
-  local min_mass = 90
-  local max_mass = 200
-  system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius-min_radius, max_radius), player_color, central_body_mass)
+  local min_radius = 20
+  local max_radius = 80
+  local min_dist = 600
+  local max_dist = 3000
+  local min_mass = 1000
+  local max_mass = 2000
+  local central_body_mass = 0
+  local si = 1
+  if sun then
+    central_body_mass = math.random(100000,400000)
+    max_rocekt_speed = 300
+    system.bodies[1] = Star.n(Vec2D.null(),central_body_mass,math.random(1.2*(max_radius-min_radius), 1.2*max_radius))
+  else
+    central_body_mass = math.random(3000,5000)
+    min_dist = 100
+    max_dist = 700
+    system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius-min_radius, max_radius), player_color, central_body_mass)
+    system.bodies[1] = system.player[1]
+    max_rocekt_speed = 150
+    min_dist = 100
+    max_dist = 700
+    min_mass = 30
+    max_mass = 90
+    si = 2
+  end
   max_radius = 10
-  for i=2,N do
+  for i=si,N do
     local d = math.random(min_dist,max_dist)
-    local r = math.random(min_radius,max_radius)
-    local mass = math.random(min_mass,max_mass)
+    local x = math.random()
+    local r = min_radius+x*(max_radius-min_radius)
+    local mass = min_mass + x*(max_mass-min_mass)
     local speed = self.universe:orbit_speed(central_body_mass,d)
     local a = math.random()*2*math.pi
     local pos = Vec2D.n(d*math.cos(a),d*math.sin(a))
     local spe = Vec2D.n(-speed*math.sin(a), speed*math.cos(a))
     system.player[i]= Body.create("P1"..i.."N",pos,spe,r,player_color,mass)
+    system.bodies[#system.bodies+1] = system.player[i]
   end
   for i=1,M do
     local d = math.random(min_dist,max_dist)
-    local r = math.random(min_radius,max_radius)
-    local mass = math.random(min_mass,max_mass)
+    local x = math.random()
+    local r = min_radius+x*(max_radius-min_radius)
+    local mass = min_mass + x*(max_mass-min_mass)
     local speed = self.universe:orbit_speed(central_body_mass,d)
     local a = math.random()*2*math.pi
     local pos = Vec2D.n(d*math.cos(a),d*math.sin(a))
     local spe = Vec2D.n(-speed*math.sin(a), speed*math.cos(a))
     system.ai[i]= Body.create("P2"..i.."N",pos,spe,r,ai_color,mass)
+    system.bodies[#system.bodies+1] = system.ai[i]
   end
   return system
 end
 
-function Game.new(player_name,N_player, N_ai, Player_center)
+function Game.new(player_name,N_player, N_ai, Player_center, sun)
   local g = {}
   setmetatable(g,Game)
   g.n_player = N_player
@@ -60,6 +82,7 @@ function Game.new(player_name,N_player, N_ai, Player_center)
   g.universe =  Phys.n(1e2)
   g.winner = ""
   g.bg =love.graphics.newImage("bg.png")
+  g.sun  = sun
   g:init()
   return g
 end
@@ -85,20 +108,20 @@ end
 function Game:init()
   local system = nil
   if self.player_center then
-    system = self:generate_system(self.n_player, self.n_ai)
+    system = self:generate_system(self.n_player, self.n_ai, self.sun)
     self.player = Player.n(self.player_name, system.player, system.player[math.random(1, self.n_player)])
     self.ai = PlayerAI.n("AI", system.ai, system.ai[math.random(1, self.n_ai)], self.player)
   else
-    system = self:generate_system(self.n_ai, self.n_player)
+    system = self:generate_system(self.n_ai, self.n_player, self.sun)
     self.player = Player.n(self.player_name, system.ai, system.ai[math.random(1, self.n_player)])
     self.ai = PlayerAI.n("AI", system.player, system.player[math.random(1, self.n_ai)], self.player)
   end
-  for _,p in pairs(system.player) do
+  for _,p in pairs(system.bodies) do
     self.universe.bodies[#self.universe.bodies+1]=p
   end
-  for _,p in pairs(system.ai) do
-    self.universe.bodies[#self.universe.bodies+1]=p
-  end
+  -- for _,p in pairs(system.ai) do
+  --   self.universe.bodies[#self.universe.bodies+1]=p
+  -- end
 end
 
 function Game:draw()

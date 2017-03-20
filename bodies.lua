@@ -1,6 +1,6 @@
 require("geotest")
 
-max_rocekt_speed = 150
+max_rocekt_speed = 300
 
 Body = {}
 Body.__index = Body
@@ -348,7 +348,7 @@ function DeadPlanet:impact(obj)
     local v = Vec2D.n(x+self.position.x,y+self.position.y)
     local d = (v-pos):mod2()
     if d<max then
-      local int = 0.2*(1-math.abs(d/max))*scale
+      local int = 0.02*(1-math.abs(d/max))*scale
       local lr = (1 - int +(math.random()-0.5)*0.08)*math.sqrt(x*x+y*y)
       self.poly[i*2-1]= lr*math.cos(i*math.pi/10)
       self.poly[i*2]= lr*math.sin(i*math.pi/10)
@@ -463,10 +463,13 @@ end
 
 function Star:remove()
   --- print('destroy debris')
-  return nil
+  return {self}
 end
 
 function Star:contains(pos)
   local rp = pos-self.position
   return rp:mod2() < self.s_radius
+end
+
+function Star:impact()
 end
