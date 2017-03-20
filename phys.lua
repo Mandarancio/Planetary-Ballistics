@@ -52,7 +52,7 @@ function Phys:update(dt)
         local v = b1.position-b2.position
         local d = v:mod()
         self:collision_manager(b1,b2,d,to_remove,to_add)
-        if b2.mass > 10 then
+        if b2.mass > 1 then
           local f = self:gforce(b1,b2)
           -- udpate speed
           -- a = f/m

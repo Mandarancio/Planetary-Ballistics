@@ -89,18 +89,24 @@ function Body:draw(scale)
 
   love.graphics.setColor(self.color.red, self.color.green, self.color.blue,100)
   love.graphics.circle('line', 0, 0, self.radius+1, 2*self.radius)
-  love.graphics.setColor(self.color.red, self.color.green, self.color.blue,255)
   -- love.graphics.line(0,0,self.speed.x,self.speed.y)
   -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
- love.graphics.polygon('line',self.poly)
+
 
 
 
   if self.selected then
+
+    love.graphics.polygon('fill', self.poly)
+
+
     if self.player.launching.status then
       self:draw_launch(self.player.launching.x, self.player.launching.y,scale)
     end
   end
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue,255)
+  love.graphics.polygon('line',self.poly)
+
   love.graphics.pop()
 end
 

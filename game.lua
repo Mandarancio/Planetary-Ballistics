@@ -10,13 +10,14 @@ function Game:generate_system(N,M, sun)
   local system = {
     player ={},
     ai = {},
-    bodies = {}
+    bodies = {},
+    central = nil
   }
   local player_color = {red=100,green = 255, blue = 100 , alpha = 255}
   local ai_color = {red=255, green = 100, blue=100, alpha =255}
   local min_radius = 20
   local max_radius = 80
-  local min_dist = 600
+  local min_dist = 200
   local max_dist = 3000
   local min_mass = 1000
   local max_mass = 2000
@@ -26,20 +27,21 @@ function Game:generate_system(N,M, sun)
     central_body_mass = math.random(100000,400000)
     max_rocekt_speed = 300
     system.bodies[1] = Star.n(Vec2D.null(),central_body_mass,math.random(1.2*(max_radius-min_radius), 1.2*max_radius))
+    system.central = system.bodies[1]
   else
     central_body_mass = math.random(3000,5000)
-    min_dist = 100
-    max_dist = 700
     system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius-min_radius, max_radius), player_color, central_body_mass)
     system.bodies[1] = system.player[1]
+    system.central = system.bodies[1]
     max_rocekt_speed = 150
-    min_dist = 100
+    min_dist = 120
     max_dist = 700
-    min_mass = 30
-    max_mass = 90
+    min_mass = 100
+    max_mass = 300
     si = 2
   end
   max_radius = 10
+  print(min_mass)
   for i=si,N do
     local d = math.random(min_dist,max_dist)
     local x = math.random()
@@ -78,11 +80,12 @@ function Game.new(player_name,N_player, N_ai, Player_center, sun)
   g.gameove = false
   g.player = nil
   g.ai = nil
-  g.scale = 1
+  g.scale = 0.5
   g.universe =  Phys.n(1e2)
   g.winner = ""
   g.bg =love.graphics.newImage("bg.png")
   g.sun  = sun
+  g.central_body = nil
   g:init()
   return g
 end
@@ -119,6 +122,11 @@ function Game:init()
   for _,p in pairs(system.bodies) do
     self.universe.bodies[#self.universe.bodies+1]=p
   end
+
+  if self.sun then
+    self.scale = 0.25
+  end
+  self.central_body = system.central
   -- for _,p in pairs(system.ai) do
   --   self.universe.bodies[#self.universe.bodies+1]=p
   -- end
