@@ -1,5 +1,8 @@
 require("player")
 require("phys")
+require("bodies")
+require("vec2d")
+
 Game  ={}
 Game.__index = Game
 

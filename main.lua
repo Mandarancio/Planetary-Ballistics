@@ -1,10 +1,7 @@
 
-require("vec2d")
-require("bodies")
-require("player")
-require("phys")
 require("utils")
 require("game")
+require("menu")
 
 screen ={
   w=0,
@@ -16,7 +13,9 @@ screen ={
 
 bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
-game= nil
+game = nil
+menu = nil
+in_game = false
 
 function shallowcopy(orig)
     local orig_type = type(orig)
@@ -41,33 +40,54 @@ function love.load()
   screen.h = love.graphics.getHeight()
   screen.cx = screen.w/2
   screen.cy = screen.h/2
+  menu = Menu.new()
   game = Game.new("Player",2,3,true)
 end
 
 
 
 function love.draw()
-  game:draw()
+  if in_game then
+    game:draw()
+  else
+    menu:draw()
+  end
 end
 
 function love.update(dt)
-  game:update(dt)
+  if in_game then
+    game:update(dt)
+  else
+    menu:update(dt)
+  end
 end
 
 function love.mousepressed(x, y, button, isTouch)
-  game:mousepressed(x,y, button)
+  if in_game then
+    game:mousepressed(x,y, button)
+  else
+    menu:mousepressed(x,y, button)
+  end
 end
 
 function love.mousemoved(x, y, dx, dy)
-  game:mousemoved(x,y)
+  if in_game then
+    game:mousemoved(x,y)
+  end
 end
 
 function love.mousereleased(x, y, button, isTouch)
-  game:mousereleased(x,y, button)
+  if in_game then
+    game:mousereleased(x,y, button)
+  end
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  game:keypressed(key)
+  if in_game then
+    game:keypressed(key)
+  else
+    menu:keypressed(key)
+  end
 end
 
 function love.keyreleased(key)

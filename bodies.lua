@@ -12,6 +12,7 @@ function Body.create(name,position, speed, radius, color, mass)
   cb.name = name
   cb.speed = speed
   cb.color = color
+  cb.accelleration = Vec2D.null()
   cb.position = position
   cb.radius = radius
   cb.s_radius = radius*radius
@@ -137,7 +138,7 @@ function Body:impact(obj)
     local v = Vec2D.n(x+self.position.x,y+self.position.y)
     local d = (v-pos):mod2()
     if d<max then
-      local int = 0.2*(1-math.abs(d/max))*scale
+      local int = 0.01*(1-math.abs(d/max))*scale
       local lr = (1 - int +(math.random()-0.5)*0.08)*math.sqrt(x*x+y*y)
       self.poly[i*2-1]= lr*math.cos(i*math.pi/10)
       self.poly[i*2]= lr*math.sin(i*math.pi/10)
@@ -160,7 +161,7 @@ function Body:impact(obj)
   elseif type == Body or type==DeadPlanet then
     self.points = 0
   else
-    self.points = self.points -2
+    self.points = self.points - 0.1
   end
   if self.points <= 0 then
     self.to_remove = true
@@ -199,6 +200,8 @@ function Rocket.n(position, speed, origin, color)
   local r = {}
   setmetatable(r,Rocket)
   r.color = color
+
+  r.accelleration = Vec2D.null()
   r.position = position
   r.max_histo = 80
   r.radius=0
@@ -266,15 +269,15 @@ end
 function Rocket:remove()
   print('destroy rocket')
   -- print(self.life)
-  if self.life >= self.max_life then
+ -- if self.life >= self.max_life then
     local d={}
     local N = math.random(4,10)
     for i =1,N do
        d[#d+1] = Debris.n(self.position+Vec2D.rand(5),self.speed+Vec2D.rand(30), self.color, 1)
     end
     return d
-  end
-  return nil
+  --end
+  --return nil
 end
 
 DeadPlanet = {}
@@ -285,7 +288,7 @@ function DeadPlanet.n(position, speed, mass, radius , poly)
   setmetatable(r,DeadPlanet)
 
   r.position = position
-
+  r.accelleration = Vec2D.null()
   r.speed = speed
   r.mass = mass
 
@@ -380,7 +383,7 @@ function Debris.n(position, speed , color, mass)
   r.color = color
   r.to_remove = false
   r.radius = 0.5
-
+  r.accelleration= Vec2D.null()
   r.s_radius = 0.25
   local delta = 2*math.pi/5
 
@@ -431,7 +434,7 @@ function Star.n(position , mass, radius)
   setmetatable(r,Star)
 
   r.position = position
-
+  r.accelleration = Vec2D.null()
   r.speed = Vec2D.null()
   r.mass = mass
   r.color = {red=255,green=255,blue=100}

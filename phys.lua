@@ -39,6 +39,7 @@ function Phys:update(dt)
   for i = 1,#self.bodies do
     local b1 = self.bodies[i]
     local old_speed= 1*b1.speed
+    local accelleration = Vec2D.null()
     if b1.to_remove then
       to_remove[#to_remove+1] = b1
       ::continue::
@@ -59,9 +60,9 @@ function Phys:update(dt)
           -- local m_a2 = f/b2.mass
           local a1 = -m_a1*v/d
           -- local a2 = m_a2*v/d
-
+          accelleration = accelleration + a1
           -- s = s+a*dt
-          b1.speed = b1.speed + a1*dt
+          --b1.speed = b1.speed + a1*dt
           -- b2.speed = b2.speed + a2*dt
           -- end
         end
@@ -71,6 +72,7 @@ function Phys:update(dt)
     -- p = p+s*dt
     -- b1.lasts:add(b1.position)
     b1:itinerary(b1.position)
+    b1.speed= b1.speed + (accelleration)*dt
     b1.position = b1.position + (b1.speed+old_speed)*dt/2
   end
   for i=1,#to_remove do
