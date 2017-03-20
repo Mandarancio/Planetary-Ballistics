@@ -239,7 +239,11 @@ function Game:keypressed(key)
       self.scale = self.scale/2
     end
   elseif key == 'escape' then
+
     self.in_pause = not self.in_pause
+    if self.gameover then
+      in_game = false
+    end
     if self.in_pause then
       self.player.launching.status =false
     end

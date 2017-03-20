@@ -43,6 +43,7 @@ end
 function Menu:exec(value)
   print(value)
   if value == 1 then
+    game =  Game.new("Player",2,3,true)
     in_game= true
   end
 end

@@ -41,7 +41,7 @@ function love.load()
   screen.cx = screen.w/2
   screen.cy = screen.h/2
   menu = Menu.new()
-  game = Game.new("Player",2,3,true)
+--  game = Game.new("Player",2,3,true)
 end
 
 
