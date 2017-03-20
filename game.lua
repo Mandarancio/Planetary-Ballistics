@@ -30,7 +30,9 @@ function Game:generate_system(N,M, sun)
     system.central = system.bodies[1]
   else
     central_body_mass = math.random(3000,5000)
-    system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius-min_radius, max_radius), player_color, central_body_mass)
+    min_radius = 20
+    max_radius = 60
+    system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius/2, max_radius), player_color, central_body_mass)
     system.bodies[1] = system.player[1]
     system.central = system.bodies[1]
     max_rocekt_speed = 150

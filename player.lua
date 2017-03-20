@@ -76,7 +76,7 @@ function PlayerAI:update(dt)
       local target = self:select_target(self.selected)
       if target~=nil then
         self.launching.t = self.t
-
+        self.selected.selected = true
         local v = (target.position-self.selected.position)+(target.speed-self.selected.speed) + Vec2D.rand(10)
         v = (0.3+math.random()*0.7)*max_rocekt_speed*v/v:mod()
         return self.selected:launch(v.x,v.y)
@@ -96,6 +96,7 @@ function PlayerAI:switch_selected()
         self.selected.selected = false
       end
       self.selected = p
+
       return
     end
     pp = pp+mp
@@ -113,6 +114,7 @@ function PlayerAI:select_target(o)
     if p.points>0  and (selected == nil or vd:mod2() < d) then
       d=vd:mod2()
       selected = p
+
     end
   end
   return selected
