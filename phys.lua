@@ -93,6 +93,62 @@ function Phys:update(dt)
   end
 end
 
+function Phys:preview(obj, orig)
+  local itinerary = {}
+  itinerary[1]=obj.position.x-orig.position.x
+  itinerary[2]=obj.position.y- orig.position.y
+
+  local simple_objects = {}
+  simple_objects[1] = {mass= orig.mass, position = 1*orig.position, speed = 1*orig.speed}
+  for _,o in pairs(self.bodies) do
+    if o~= orig and o.mass > 10 then
+      simple_objects[#simple_objects+1]={mass = o.mass, position = 1*o.position, speed = 1*o.speed}
+    end
+  end
+
+  local dt = 0.05
+  for t=1,60 do
+    local t_speed = 1*obj.speed
+    local t_acc = Vec2D.null()
+
+    -- for i=1,#simple_objects do
+    --   local a= simple_objects[i]
+    --   local old_speed = 1*a.speed
+    --   local acc = Vec2D.null()
+    --   for j=1,#simple_objects do
+    --     if j~=i then
+    --       local b = simple_objects[j]
+    --       local v = b.position-a.position
+    --       local d = v:mod()
+    --       local f = self:gforce(a,b)
+    --       local m_a1 = f/a.mass
+    --       local a1 = m_a1*v/d
+    --       acc = acc + a1
+    --     end
+    --   end
+    --   a.speed= a.speed + (acc)*dt
+    --   a.position = a.position + (a.speed+old_speed)*dt/2
+    -- end
+
+    for i=1,#simple_objects do
+      local b = simple_objects[i]
+      local v = obj.position-b.position
+      local d = v:mod()
+      local f = self:gforce(obj,b)
+      local m_a1 = f/obj.mass
+      local a1 = -m_a1*v/d
+      t_acc = t_acc + a1
+    end
+    obj.speed = obj.speed+(t_acc)*dt
+    obj.position = obj.position + (obj.speed+t_speed)*dt/2
+
+    itinerary[#itinerary+1]=  obj.position.x - orig.position.x
+    itinerary[#itinerary+1]=  obj.position.y - orig.position.y --obj.position.y- simple_objects[1].position.y
+
+  end
+  return itinerary
+end
+
 function Phys:collision_manager(a,b,d, to_remove, to_add)
   local atype = getmetatable(a)
   local btype = getmetatable(b)

@@ -6,6 +6,8 @@ require("vec2d")
 Game  ={}
 Game.__index = Game
 
+universe = nil
+
 function Game:generate_system(N,M, sun)
   local system = {
     player ={},
@@ -49,7 +51,7 @@ function Game:generate_system(N,M, sun)
     local x = math.random()
     local r = min_radius+x*(max_radius-min_radius)
     local mass = min_mass + x*(max_mass-min_mass)
-    local speed = self.universe:orbit_speed(central_body_mass,d)
+    local speed = universe:orbit_speed(central_body_mass,d)
     local a = math.random()*2*math.pi
     local pos = Vec2D.n(d*math.cos(a),d*math.sin(a))
     local spe = Vec2D.n(-speed*math.sin(a), speed*math.cos(a))
@@ -61,7 +63,7 @@ function Game:generate_system(N,M, sun)
     local x = math.random()
     local r = min_radius+x*(max_radius-min_radius)
     local mass = min_mass + x*(max_mass-min_mass)
-    local speed = self.universe:orbit_speed(central_body_mass,d)
+    local speed = universe:orbit_speed(central_body_mass,d)
     local a = math.random()*2*math.pi
     local pos = Vec2D.n(d*math.cos(a),d*math.sin(a))
     local spe = Vec2D.n(-speed*math.sin(a), speed*math.cos(a))
@@ -83,7 +85,7 @@ function Game.new(player_name,N_player, N_ai, Player_center, sun)
   g.player = nil
   g.ai = nil
   g.scale = 0.5
-  g.universe =  Phys.n(1e2)
+  universe =  Phys.n(1e2)
   g.winner = ""
   g.bg =love.graphics.newImage("bg.png")
   g.sun  = sun
@@ -122,7 +124,7 @@ function Game:init()
     self.ai = PlayerAI.n("AI", system.player, system.player[math.random(1, self.n_ai)], self.player)
   end
   for _,p in pairs(system.bodies) do
-    self.universe.bodies[#self.universe.bodies+1]=p
+    universe.bodies[#universe.bodies+1]=p
   end
 
   if self.sun then
@@ -159,7 +161,7 @@ function Game:draw()
   if self.player.selected~=nil then
     love.graphics.translate(-self.player.selected.position.x, - self.player.selected.position.y)
   end
-  for _,body in pairs(self.universe.bodies) do
+  for _,body in pairs(universe.bodies) do
     body:draw(self.scale)
   end
   love.graphics.pop()
@@ -193,10 +195,10 @@ end
 
 function Game:update(dt)
   if not self.in_pause and not self.gameover then
-    self.universe:update(dt)
+    universe:update(dt)
     local r = self.ai:update(dt)
     if r~=nil then
-        self.universe.bodies[#self.universe.bodies+1]=r
+        universe.bodies[#universe.bodies+1]=r
     end
     if self.player:points()==0 then
       self.gameover = true
@@ -257,7 +259,7 @@ function Game:mousereleased(x, y, button)
     self.player.launching.status = false
     local r = self.player.selected:launch((x-screen.cx)/self.scale,(y-screen.cy)/self.scale,self.scale)
     if r~=nil then
-      self.universe.bodies[#self.universe.bodies+1]=r
+      universe.bodies[#universe.bodies+1]=r
     end
   end
 end

@@ -37,33 +37,46 @@ end
 
 
 function Body:draw_launch(x,y, scale)
-  love.graphics.push()
-  love.graphics.scale(1/scale, 1/scale)
+
   d = x*x+y*y
   if d > self.s_radius then
-    a = math.atan2(y, x)
-    x0 = (self.radius+5)*math.cos(a)*scale
-    y0 = (self.radius+5)*math.sin(a)*scale
+    love.graphics.push()
+    love.graphics.scale(1/scale, 1/scale)
+    local a = math.atan2(y, x)
+    local x0 = (self.radius+5)*math.cos(a)*scale
+    local y0 = (self.radius+5)*math.sin(a)*scale
 
     if d>max_rocekt_speed^2 then
-      x1 = max_rocekt_speed * math.cos(a)
-      y1 = max_rocekt_speed * math.sin(a)
+      local x1 = max_rocekt_speed * math.cos(a)
+      local y1 = max_rocekt_speed * math.sin(a)
 
       love.graphics.setColor(255, 255, 255, 50)
-      love.graphics.line(x1,y1,x,y)
       love.graphics.rectangle('line', x-5, y-5, 10,10)
+      love.graphics.line(x0, y0, x1, y1)
+
       love.graphics.setColor(100, 255, 100, 150)
 
-      love.graphics.line(x0, y0, x1, y1)
       love.graphics.circle('line', x1, y1, 5, 10)
     else
+      love.graphics.setColor(255, 255, 255, 50)
+
+      love.graphics.line(x0, y0, x, y)
+
       love.graphics.setColor(100, 255, 100, 150)
 
       love.graphics.rectangle('line', x-5, y-5, 10,10)
-      love.graphics.line(x0, y0, x, y)
     end
+
+    love.graphics.pop()
+    local s = Vec2D.n(x/scale,y/scale)
+    local m = s:mod()
+    if m>max_rocekt_speed then
+      s = s*max_rocekt_speed*1.5/m
+    end
+    local it = universe:preview({position=Vec2D.n(x0/scale,y0/scale)+self.position,mass=1,speed=s+self.speed},self)
+    love.graphics.points(it)
+    -- love.graphics.line(it)
   end
-  love.graphics.pop()
 end
 
 function Body:launch(x,y)
