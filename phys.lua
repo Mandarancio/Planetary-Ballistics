@@ -166,7 +166,7 @@ function Phys:collision_manager(a,b,d, to_remove, to_add)
     to_remove[#to_remove+1] = a
     to_remove[#to_remove+1] = b
   end
-  if ((d<a.radius) or ( d<b.radius)) and (a:contains(b.position) or b:contains(a.position)) then
+  if (d<a.radius+b.radius) then --and (a:contains(b.position) or b:contains(a.position)) then
     if btype == Rocket  and atype == Body then
       local l_to_add = a:impact(b)
       b:target(a)
