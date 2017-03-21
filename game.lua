@@ -145,7 +145,7 @@ function Game:draw()
     love.graphics.draw(self.bg,self.quad,-screen.w*8,-screen.h*8,0,1,1,self.scale*self.player.selected.position.x,self.scale*self.player.selected.position.y)
 
   else
-    love.graphics.draw(self.bg,-screen.w*8,-screen.h*8)
+    love.graphics.draw(self.bg,self.quad,-screen.w*8,-screen.h*8)
   end
   local bfh = bigFont:getHeight()
   local sfh = smallFont:getHeight()
