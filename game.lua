@@ -87,7 +87,10 @@ function Game.new(player_name,N_player, N_ai, Player_center, sun)
   g.scale = 0.5
   universe =  Phys.n(1e2)
   g.winner = ""
-  g.bg =love.graphics.newImage("bg.png")
+  g.bg =love.graphics.newImage("bg_tail.png")
+  g.bg:setWrap("repeat", "repeat")
+  g.quad = love.graphics.newQuad(-8*screen.w, -8*screen.h, 16*screen.w,16*screen.h, g.bg:getWidth(), g.bg:getHeight())
+
   g.sun  = sun
   g.central_body = nil
   g:init()
@@ -138,7 +141,12 @@ end
 
 function Game:draw()
   love.graphics.setColor(100, 255, 100, 255)
-  love.graphics.draw(self.bg, 0, 0)
+  if self.player.selected~=nil then
+    love.graphics.draw(self.bg,self.quad,-screen.w*8,-screen.h*8,0,1,1,self.scale*self.player.selected.position.x,self.scale*self.player.selected.position.y)
+
+  else
+    love.graphics.draw(self.bg,-screen.w*8,-screen.h*8)
+  end
   local bfh = bigFont:getHeight()
   local sfh = smallFont:getHeight()
   love.graphics.setFont(bigFont)
