@@ -139,6 +139,9 @@ function Phys:preview(obj, orig)
       local a1 = -m_a1*v/d
       t_acc = t_acc + a1
     end
+    if t_acc:mod() > 1e4 then
+      return itinerary
+    end
     obj.speed = obj.speed+(t_acc)*dt
     obj.position = obj.position + (obj.speed+t_speed)*dt/2
 
