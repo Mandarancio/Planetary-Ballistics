@@ -275,11 +275,11 @@ end
 function Game:keypressed(key)
   if key == 'p' then
     if self.scale < 4 then
-      self.scale = self.scale*2
+      self.scale = self.scale/0.9
     end
   elseif key == 'm' then
     if self.scale > 1/32 then
-      self.scale = self.scale/2
+      self.scale = self.scale*0.9
     end
   elseif key == 'escape' then
 

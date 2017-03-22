@@ -74,7 +74,10 @@ function Body:draw_launch(x,y, scale)
       s = s*max_rocekt_speed*1.5/m
     end
     local it = universe:preview({position=Vec2D.n(x0/scale,y0/scale)+self.position,mass=1,speed=s+self.speed},self)
-    love.graphics.points(it)
+    for i=1,#it,4 do
+      love.graphics.circle('line', it[i], it[i+1], 1/scale, 1/scale*5)
+    end
+    -- love.graphics.points(it)
     -- love.graphics.line(it)
   end
 end
@@ -200,7 +203,7 @@ function Body:itinerary(old)
 end
 
 function Body:remove()
-  print("Destroy : "..self.name.." : "..self.points)
+  -- print("Destroy : "..self.name.." : "..self.points)
   if self.selected then
     self.selected = false
     self.player.selected = nil
@@ -286,7 +289,7 @@ function Rocket:target(b)
 end
 
 function Rocket:remove()
-  print('destroy rocket')
+  -- print('destroy rocket')
   -- print(self.life)
  -- if self.life >= self.max_life then
     local d={}
