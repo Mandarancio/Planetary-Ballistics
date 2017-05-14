@@ -1,4 +1,6 @@
-# Planetary-Ballistics
+# ![Planetary Ballistic](logo.png)
+
+
 Your moons are shotting at you... Nukes! Defend yourself and your allied satellites in this planetary shooter!
 
 Select the plaent or the satellite you wanna use as lunching base, aim and shoot in this very intuitive game.
