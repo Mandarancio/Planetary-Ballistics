@@ -15,8 +15,8 @@ function Game:generate_system(N,M, sun)
     bodies = {},
     central = nil
   }
-  local player_color = {red=100,green = 255, blue = 100 , alpha = 255}
-  local ai_color = {red=255, green = 100, blue=100, alpha =255}
+  local player_color = {red=0.5,green = 1, blue = 0.5, alpha = 1}
+  local ai_color = {red=1, green = 0.5, blue=0.5, alpha =1}
   local min_radius = 20
   local max_radius = 80
   local min_dist = 200
