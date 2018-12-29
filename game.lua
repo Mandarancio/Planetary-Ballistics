@@ -140,7 +140,7 @@ function Game:init()
 end
 
 function Game:draw()
-  love.graphics.setColor(100, 255, 100, 255)
+  love.graphics.setColor(0.5, 1, 0.5, 1)
   if self.player.selected~=nil then
     love.graphics.draw(self.bg,self.quad,-screen.w*8,-screen.h*8,0,1,1,self.scale*self.player.selected.position.x,self.scale*self.player.selected.position.y)
 
@@ -174,9 +174,9 @@ function Game:draw()
   end
   love.graphics.pop()
   if self.gameover then
-    love.graphics.setColor(0,0,0,180)
+    love.graphics.setColor(0,0,0, 0.6)
     love.graphics.rectangle('fill', 0, 0, screen.w, screen.h)
-    love.graphics.setColor(255,255,255)
+    love.graphics.setColor(1,1,1)
     love.graphics.setFont(bigFont)
     local string="Game Over"
     local w = bigFont:getWidth(string)
@@ -187,9 +187,9 @@ function Game:draw()
     love.graphics.print(string,screen.cx-w/2,screen.cy+bfh/2+sfh/2)
 
   elseif self.in_pause then
-    love.graphics.setColor(0,0,0,180)
+    love.graphics.setColor(0,0,0,0.6)
     love.graphics.rectangle('fill', 0, 0, screen.w, screen.h)
-    love.graphics.setColor(255,255,255)
+    love.graphics.setColor(1,1,1)
     love.graphics.setFont(bigFont)
     local string="Pause"
     local w = bigFont:getWidth(string)

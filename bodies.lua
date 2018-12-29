@@ -50,19 +50,19 @@ function Body:draw_launch(x,y, scale)
       local x1 = max_rocekt_speed * math.cos(a)
       local y1 = max_rocekt_speed * math.sin(a)
 
-      love.graphics.setColor(255, 255, 255, 50)
+      love.graphics.setColor(1, 1, 1, 0.2)
       love.graphics.rectangle('line', x-5, y-5, 10,10)
       love.graphics.line(x0, y0, x1, y1)
 
-      love.graphics.setColor(100, 255, 100, 150)
+      love.graphics.setColor(0.5, 1, 0.5, 1)
 
       love.graphics.circle('line', x1, y1, 5, 10)
     else
-      love.graphics.setColor(255, 255, 255, 50)
+      love.graphics.setColor(1, 1, 1, 0.2)
 
       love.graphics.line(x0, y0, x, y)
 
-      love.graphics.setColor(100, 255, 100, 150)
+      love.graphics.setColor(0.5, 1, 0.5, 0.5)
 
       love.graphics.rectangle('line', x-5, y-5, 10,10)
     end
@@ -249,7 +249,7 @@ function Rocket:draw()
   local alpha = (self.max_histo-#self.__itinerary)*(100/self.max_histo)
   for i=1,#self.__itinerary do
 
-    love.graphics.setColor(255,255,255,alpha)
+    love.graphics.setColor(1, 1, 1,alpha)
     alpha = alpha+1
     -- love.graphics.line(self.__itinerary[i-1].x,self.__itinerary[i-1].y, self.__itinerary[i].x,self.__itinerary[i].y)
     -- local k = ((1-i/#self.__itinerary)^4)*self.origin.position
@@ -329,7 +329,7 @@ end
 function DeadPlanet:draw()
   love.graphics.push()
   love.graphics.translate(self.position.x, self.position.y)
-  love.graphics.setColor(155,155,155)
+  love.graphics.setColor(0.5,0.5,0.5)
   -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
   love.graphics.polygon('line',self.poly)
   love.graphics.pop()
@@ -472,9 +472,9 @@ end
 function Star:draw()
   love.graphics.push()
   love.graphics.translate(self.position.x, self.position.y)
-  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, 150)
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, 0.5)
   love.graphics.circle('fill', 0, 0, self.radius, self.radius*2)
-  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, 255)
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, 1)
   love.graphics.circle('line', 0, 0, self.radius, self.radius*2)
 
   love.graphics.pop()

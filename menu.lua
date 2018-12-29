@@ -14,11 +14,11 @@ function Menu:update(dt)
 end
 
 function Menu:draw()
-  love.graphics.setColor(0, 0, 0, 255)
+  love.graphics.setColor(0, 0, 0, 1)
   love.graphics.rectangle('fill', 0, 0,screen.w, screen.h)
-  love.graphics.setColor(255, 255, 255, 255)
+  love.graphics.setColor(1, 1, 1, 1)
   love.graphics.draw(self.logo,0,0)
-  love.graphics.setColor(0, 255, 0, 255)
+  love.graphics.setColor(0, 1, 0, 1)
   love.graphics.setFont(bigFont)
   local fh = bigFont:getHeight()
   local y =250
@@ -26,9 +26,9 @@ function Menu:draw()
   local rw = 300
   for i=1,#self.items do
     if i == self.selected then
-      love.graphics.setColor(0, 255, 0, 255)
+      love.graphics.setColor(0, 1, 0, 1)
     else
-      love.graphics.setColor(255, 255, 255, 255)
+      love.graphics.setColor(1, 1, 1, 1)
     end
 
     local string = self.items[i]
