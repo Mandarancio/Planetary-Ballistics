@@ -31,6 +31,21 @@ function Player:points()
   return point/self.tot_value
 end
 
+function Player:selectNext()
+  local sel = self.selected
+  id_i = sel.id - 1 
+  N = table.getn(self.bodies)
+  id_n = (id_i + 1)% N
+  while self.bodies[id_n+1].points <= 0 do
+    id_n = (id_n + 1) % N
+  end
+  sel.selected = false
+  sel = self.bodies[id_n+1]
+  
+  sel.selected = true
+  self.selected = sel
+end
+
 PlayerAI = {}
 PlayerAI.__index = PlayerAI
 
@@ -53,6 +68,21 @@ function PlayerAI.n(name, bodies, selected, enemy)
     t = 0,
   }
   return p
+end
+
+function PlayerAI:selectNext()
+  local sel = self.selected
+  id_i = sel.id - 1 
+  N = table.getn(self.bodies)
+  id_n = (id_i + 1)% N
+  while self.bodies[id_n+1].points <= 0 do
+    id_n = (id_n + 1) % N
+  end
+  sel.selected = false
+  sel = self.bodies[id_n+1]
+  
+  sel.selected = true
+  self.selected = sel
 end
 
 function PlayerAI:points()
