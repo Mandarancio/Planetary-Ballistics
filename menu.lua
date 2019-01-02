@@ -41,7 +41,6 @@ function Menu:draw()
 end
 
 function Menu:exec(value)
-  print(value)
   if value == 1 then
     game =  Game.new("Player",2,3,true, false)
     in_game= true
