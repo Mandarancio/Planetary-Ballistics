@@ -36,7 +36,7 @@ function Player:selectNext()
   id_i = sel.id - 1 
   N = table.getn(self.bodies)
   id_n = (id_i + 1)% N
-  while self.bodies[id_n+1].points <= 0 do
+  while self.bodies[id_n+1].points <= 0 and id_i ~= id_n do
     id_n = (id_n + 1) % N
   end
   sel.selected = false
