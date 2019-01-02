@@ -275,7 +275,7 @@ function Game:mousereleased(x, y, button)
 end
 
 function Game:keypressed(key)
-  if key == 'p' then
+  if key == '+' then
     if self.scale < 4 then
       self.scale = self.scale/0.9
     end
