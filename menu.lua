@@ -6,34 +6,66 @@ Menu = {}
 Menu.__index = Menu
 
 function Menu.new()
+  N = 100
   local m = {}
   setmetatable(m,Menu)
   m.logo = love.graphics.newImage("logo_nobg.png")
   m.selected = 1
   m.items = {'Planetary System', 'Solar System', 'Commands', 'Quit'}
-  m.b1 = Body.create("a", Vec2D.n(50, 0), Vec2D.n(60, -60), 30, {red=1, green = 1, blue=1, alpha =0.5}, 10000, 1)
-  m.b1.selected = true
-  m.b2 = Body.create("b", Vec2D.n(-50, 0), Vec2D.n(-10, 60), 25, {red=1, green = 1, blue=1, alpha =0.5}, 8000, 1)
-  m.b2.selected = true
-  m.universe = Phys.n(1e2)
-  m.universe.bodies = {m.b1, m.b2}
+  m.bodies = {}
+  m.G = 1e-11
+  m.r = Vec2D.null()
+  for i=1, N do
+    p = Vec2D.rand(200)
+    m.bodies[i] = {p, -0.1*math.random()*p/p:mod(), math.random()*1e9}
+    m.r = m.r + p
+  end
+  m.r = m.r / #m.bodies
   return m
 end
 
 function Menu:update(dt)
-  self.universe:update(dt)
+  r = Vec2D.null()
+  G = self.G
+  for i, b1 in pairs(self.bodies) do
+    x1 = b1[1]
+    v1 = b1[2]
+    m1 = b1[3]
+    for j=i+1, #self.bodies do
+      b2 = self.bodies[j]
+      x2 = b2[1]
+      v2 = b2[2]
+      m2 = b2[3]
+      d = x1 - x2
+      F = G*m1*m2*d/(d:mod()^3)
+      a12 = F/m1
+      a21 = F/(-m2)
+      v1 = v1 + a12 * dt
+      v2 = v2 + a21 * dt
+      x1 = x1 + v1 * dt
+      x2 = x2 + v2 * dt
+      b2[1] = x2
+      b2[2] = v2
+    end
+    b1[1] = x1
+    b1[2] = v1
+    r = r + x1
+  end
+  self.r = r / #self.bodies
 end
 
 function Menu:draw()
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.rectangle('fill', 0, 0,screen.w, screen.h)
-  r = (self.b1.position + self.b2.position)/2
-  cx = screen.w / 2 - r.x
-  cy = screen.h / 2 + 50 - r.y
+  
+  cx = screen.w / 2 - self.r.x
+  cy = screen.h / 2 + 50 - self.r.y
   love.graphics.push()
   love.graphics.translate(cx, cy)
-  self.b1:draw()
-  self.b2:draw()
+  love.graphics.setColor(1,1,1,0.9)
+  for _, b in pairs(self.bodies) do
+    love.graphics.points(b[1].x, b[1].y)
+  end
   love.graphics.pop()
   love.graphics.setColor(0, 0, 0, 0.3)
 
