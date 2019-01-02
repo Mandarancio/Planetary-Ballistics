@@ -196,7 +196,10 @@ function Game:draw()
     string = "Press ESC to resume"
     w = smallFont:getWidth(string)
     love.graphics.setFont(smallFont)
-    love.graphics.print(string,screen.cx-w/2,screen.cy+bfh/2+sfh/2)
+    love.graphics.print(string,screen.cx-w/2,screen.cy+bfh/2+sfh)
+    string = "Press Q to exit"
+    w = smallFont:getWidth(string)
+    love.graphics.print(string,screen.cx-w/2,screen.cy+bfh+sfh*2)
   end
 end
 
@@ -276,20 +279,23 @@ function Game:keypressed(key)
     if self.scale < 4 then
       self.scale = self.scale/0.9
     end
-  elseif key == 'm' then
+  elseif key == '-' then
     if self.scale > 1/32 then
       self.scale = self.scale*0.9
     end
   elseif key == 'tab' then
     self.player:selectNext()
   elseif key == 'escape' then
-
     self.in_pause = not self.in_pause
     if self.gameover then
       in_game = false
     end
     if self.in_pause then
       self.player.launching.status =false
+    end
+  elseif key == 'q' or key == 'Q' then
+    if self.in_pause or self.gameover then
+      in_game = false
     end
   end
 end
