@@ -109,13 +109,9 @@ function Body:draw(scale)
   -- love.graphics.line(0,0,self.speed.x,self.speed.y)
   -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
 
-
-
-
   if self.selected then
 
     love.graphics.polygon('fill', self.poly)
-
 
     if self.player.launching.status then
       self:draw_launch(self.player.launching.x, self.player.launching.y,scale)
