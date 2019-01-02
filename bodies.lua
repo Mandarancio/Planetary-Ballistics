@@ -6,10 +6,11 @@ Body = {}
 Body.__index = Body
 
 
-function Body.create(name,position, speed, radius, color, mass)
+function Body.create(name,position, speed, radius, color, mass, id)
   local cb = {}
   setmetatable(cb, Body)
   cb.name = name
+  cb.id = id
   cb.speed = speed
   cb.color = color
   cb.accelleration = Vec2D.null()
@@ -103,7 +104,7 @@ function Body:draw(scale)
   love.graphics.push()
   love.graphics.translate(self.position.x, self.position.y)
 
-  love.graphics.setColor(self.color.red, self.color.green, self.color.blue,100)
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue, 0.4)
   love.graphics.circle('line', 0, 0, self.radius+1, 2*self.radius)
   -- love.graphics.line(0,0,self.speed.x,self.speed.y)
   -- love.graphics.circle("line", 0, 0, self.radius, 2*self.radius)
@@ -120,7 +121,7 @@ function Body:draw(scale)
       self:draw_launch(self.player.launching.x, self.player.launching.y,scale)
     end
   end
-  love.graphics.setColor(self.color.red, self.color.green, self.color.blue,255)
+  love.graphics.setColor(self.color.red, self.color.green, self.color.blue,1)
   love.graphics.polygon('line',self.poly)
 
   love.graphics.pop()
@@ -206,7 +207,7 @@ function Body:remove()
   -- print("Destroy : "..self.name.." : "..self.points)
   if self.selected then
     self.selected = false
-    self.player.selected = nil
+    self.player:selectNext()
   end
   self.points = 0
 
@@ -459,7 +460,7 @@ function Star.n(position , mass, radius)
   r.accelleration = Vec2D.null()
   r.speed = Vec2D.null()
   r.mass = mass
-  r.color = {red=255,green=255,blue=100}
+  r.color = {red=1,green=1,blue=0.4}
   r.to_remove = false
   r.radius = radius
   r.s_radius = r.radius^2
