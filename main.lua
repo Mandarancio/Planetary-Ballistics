@@ -2,6 +2,7 @@
 require("utils")
 require("game")
 require("menu")
+require("enum")
 
 screen ={
   w=0,
@@ -10,12 +11,12 @@ screen ={
   cy = 0
 }
 
-
+status = enum({"menu", "game", "help"})
 bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
 game = nil
 menu = nil
-in_game = false
+in_game = status.menu
 
 function shallowcopy(orig)
     local orig_type = type(orig)
@@ -47,45 +48,45 @@ end
 
 
 function love.draw()
-  if in_game then
+  if in_game == status.game then
     game:draw()
-  else
+  elseif in_game == status.menu then
     menu:draw()
   end
 end
 
 function love.update(dt)
-  if in_game then
+  if in_game == status.game then
     game:update(dt)
-  else
+  elseif in_game == status.menu then
     menu:update(dt)
   end
 end
 
 function love.mousepressed(x, y, button, isTouch)
-  if in_game then
+  if in_game == status.game then
     game:mousepressed(x,y, button)
-  else
+  elseif in_game == status.menu then
     menu:mousepressed(x,y, button)
   end
 end
 
 function love.mousemoved(x, y, dx, dy)
-  if in_game then
+  if in_game == status.game then
     game:mousemoved(x,y)
   end
 end
 
 function love.mousereleased(x, y, button, isTouch)
-  if in_game then
+  if in_game == status.game then
     game:mousereleased(x,y, button)
   end
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  if in_game then
+  if in_game == status.game then
     game:keypressed(key)
-  else
+  elseif in_game == status.menu then
     menu:keypressed(key)
   end
 end

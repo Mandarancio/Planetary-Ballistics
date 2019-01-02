@@ -288,14 +288,14 @@ function Game:keypressed(key)
   elseif key == 'escape' then
     self.in_pause = not self.in_pause
     if self.gameover then
-      in_game = false
+      in_game = status.menu
     end
     if self.in_pause then
       self.player.launching.status =false
     end
   elseif key == 'q' or key == 'Q' then
     if self.in_pause or self.gameover then
-      in_game = false
+      in_game = status.menu
     end
   end
 end
