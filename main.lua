@@ -3,6 +3,7 @@ require("utils")
 require("game")
 require("menu")
 require("enum")
+require("help")
 
 screen ={
   w=0,
@@ -15,6 +16,7 @@ status = enum({"menu", "game", "help"})
 bigFont = love.graphics.newFont("whitrabt.ttf",18)
 smallFont = love.graphics.newFont("whitrabt.ttf",16)
 game = nil
+help = nil
 menu = nil
 in_game = status.menu
 
@@ -42,6 +44,7 @@ function love.load()
   screen.cx = screen.w/2
   screen.cy = screen.h/2
   menu = Menu.new()
+  help = Help.new()
 --  game = Game.new("Player",2,3,true)
 end
 
@@ -52,6 +55,8 @@ function love.draw()
     game:draw()
   elseif in_game == status.menu then
     menu:draw()
+  elseif in_game == status.help then
+    help:draw()
   end
 end
 
@@ -88,6 +93,8 @@ function love.keypressed(key, scancode, isrepeat)
     game:keypressed(key)
   elseif in_game == status.menu then
     menu:keypressed(key)
+  elseif in_game == status.help then
+    help:keypressed(key)
   end
 end
 
