@@ -3,7 +3,7 @@ require("phys")
 require("bodies")
 require("vec2d")
 
-Game  ={}
+Game  = {}
 Game.__index = Game
 
 universe = nil
@@ -34,7 +34,7 @@ function Game:generate_system(N,M, sun)
     central_body_mass = math.random(3000,5000)
     min_radius = 20
     max_radius = 60
-    system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius/2, max_radius), player_color, central_body_mass)
+    system.player[1] = Body.create("P1N1",Vec2D.null(), Vec2D.null(), math.random(max_radius/2, max_radius), player_color, central_body_mass, 1)
     system.bodies[1] = system.player[1]
     system.central = system.bodies[1]
     max_rocekt_speed = 150
@@ -45,7 +45,6 @@ function Game:generate_system(N,M, sun)
     si = 2
   end
   max_radius = 10
-  print(min_mass)
   for i=si,N do
     local d = math.random(min_dist,max_dist)
     local x = math.random()
@@ -55,7 +54,7 @@ function Game:generate_system(N,M, sun)
     local a = math.random()*2*math.pi
     local pos = Vec2D.n(d*math.cos(a),d*math.sin(a))
     local spe = Vec2D.n(-speed*math.sin(a), speed*math.cos(a))
-    system.player[i]= Body.create("P1"..i.."N",pos,spe,r,player_color,mass)
+    system.player[i]= Body.create("P1"..i.."N",pos,spe,r,player_color,mass, i)
     system.bodies[#system.bodies+1] = system.player[i]
   end
   for i=1,M do
@@ -67,7 +66,7 @@ function Game:generate_system(N,M, sun)
     local a = math.random()*2*math.pi
     local pos = Vec2D.n(d*math.cos(a),d*math.sin(a))
     local spe = Vec2D.n(-speed*math.sin(a), speed*math.cos(a))
-    system.ai[i]= Body.create("P2"..i.."N",pos,spe,r,ai_color,mass)
+    system.ai[i]= Body.create("P2"..i.."N",pos,spe,r,ai_color,mass, i)
     system.bodies[#system.bodies+1] = system.ai[i]
   end
   return system
@@ -97,12 +96,12 @@ function Game.new(player_name,N_player, N_ai, Player_center, sun)
   return g
 end
 
-function Game:draw_rocket(x,y,w,h)
+function Game:draw_rocket(x, y, w, h)
   local th=h/4
   love.graphics.line(x,y,x+w,y,x+w,y-h+th,x+w/2,y-h,x,y-h+th,x,y)
 end
 
-function  Game:draw_rockets(num, x,y, w,h)
+function Game:draw_rockets(num, x, y, w, h)
   ts= 4
   for i=1,num do
     self:draw_rocket(x,y,w,h)
@@ -281,6 +280,8 @@ function Game:keypressed(key)
     if self.scale > 1/32 then
       self.scale = self.scale*0.9
     end
+  elseif key == 'tab' then
+    self.player:selectNext()
   elseif key == 'escape' then
 
     self.in_pause = not self.in_pause
