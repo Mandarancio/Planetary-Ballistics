@@ -8,7 +8,7 @@ Menu.__index = Menu
 function Menu.new()
   local m = {}
   setmetatable(m,Menu)
-  m.logo = love.graphics.newImage("logo.png")
+  m.logo = love.graphics.newImage("logo_nobg.png")
   m.selected = 1
   m.items = {'Planetary System', 'Solar System', 'Commands', 'Quit'}
   m.b1 = Body.create("a", Vec2D.n(50, 0), Vec2D.n(60, -60), 30, {red=1, green = 1, blue=1, alpha =0.5}, 10000, 1)
