@@ -113,7 +113,7 @@ function Body:draw(scale)
 
     love.graphics.polygon('fill', self.poly)
 
-    if self.player.launching.status then
+    if self.player and self.player.launching.status then
       self:draw_launch(self.player.launching.x, self.player.launching.y,scale)
     end
   end
@@ -203,7 +203,9 @@ function Body:remove()
   -- print("Destroy : "..self.name.." : "..self.points)
   if self.selected then
     self.selected = false
-    self.player:selectNext()
+    if self.player then
+      self.player:selectNext()
+    end
   end
   self.points = 0
 
