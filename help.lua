@@ -19,5 +19,6 @@ end
 function Help:keypressed(key)
   if key == 'escape' then
     self.active = false
+    in_game = status.menu
   end
 end
