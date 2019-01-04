@@ -44,7 +44,7 @@ function love.load()
   screen.cx = screen.w/2
   screen.cy = screen.h/2
   menu = Menu.new()
-  help = Help.new()
+  help = Help.new({{"ESC", "Pause game"}, {"TAB","Change planet"}, {"I", "Zoom In"}, {"O", "Zoom Out"}})
 --  game = Game.new("Player",2,3,true)
 end
 
@@ -70,9 +70,11 @@ end
 
 function love.mousepressed(x, y, button, isTouch)
   if in_game == status.game then
-    game:mousepressed(x,y, button)
+    game:mousepressed(x, y, button)
   elseif in_game == status.menu then
-    menu:mousepressed(x,y, button)
+    menu:mousepressed(x, y, button)
+  elseif in_game == status.help then
+    help:mousepressed(x, y, button)
   end
 end
 
