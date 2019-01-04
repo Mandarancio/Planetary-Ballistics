@@ -25,33 +25,33 @@ function Menu.new()
 end
 
 function Menu:update(dt)
-  r = Vec2D.null()
-  G = self.G
-  for i, b1 in pairs(self.bodies) do
-    x1 = b1[1]
-    v1 = b1[2]
-    m1 = b1[3]
-    for j=i+1, #self.bodies do
-      b2 = self.bodies[j]
-      x2 = b2[1]
-      v2 = b2[2]
-      m2 = b2[3]
-      d = x1 - x2
-      F = G*m1*m2*d/(d:mod()^3)
-      a12 = F/m1
-      a21 = F/(-m2)
-      v1 = v1 + a12 * dt
-      v2 = v2 + a21 * dt
-      x1 = x1 + v1 * dt
-      x2 = x2 + v2 * dt
-      b2[1] = x2
-      b2[2] = v2
-    end
-    b1[1] = x1
-    b1[2] = v1
-    r = r + x1
-  end
-  self.r = r / #self.bodies
+--  r = Vec2D.null()
+--  G = self.G
+--  for i, b1 in pairs(self.bodies) do
+--    x1 = b1[1]
+--    v1 = b1[2]
+--    m1 = b1[3]
+--    for j=i+1, #self.bodies do
+--      b2 = self.bodies[j]
+--      x2 = b2[1]
+--      v2 = b2[2]
+--      m2 = b2[3]
+--      d = x1 - x2
+--      F = G*m1*m2*d/(d:mod()^3)
+--      a12 = F/m1
+--      a21 = F/(-m2)
+--      v1 = v1 + a12 * dt
+--      v2 = v2 + a21 * dt
+--      x1 = x1 + v1 * dt
+--      x2 = x2 + v2 * dt
+--      b2[1] = x2
+--      b2[2] = v2
+--    end
+--    b1[1] = x1
+--    b1[2] = v1
+--    r = r + x1
+--  end
+--  self.r = r / #self.bodies
 end
 
 function Menu:draw()
@@ -63,9 +63,9 @@ function Menu:draw()
   love.graphics.push()
   love.graphics.translate(cx, cy)
   love.graphics.setColor(1,1,1,0.9)
-  for _, b in pairs(self.bodies) do
-    love.graphics.points(b[1].x, b[1].y)
-  end
+  -- for _, b in pairs(self.bodies) do
+  --   love.graphics.points(b[1].x, b[1].y)
+  -- end
   love.graphics.pop()
   love.graphics.setColor(0, 0, 0, 0.3)
 
@@ -129,10 +129,11 @@ function Menu:mousepressed(x,y, button)
 end
 
 function Menu:keypressed(key)
-  if key == 'down' and self.selected<table.getn(self.items) then
-    self.selected = self.selected+1
-  elseif key == 'up' and self.selected>1 then
-    self.selected = self.selected-1
+  local N = table.getn(self.items)
+  if key == 'down' then
+    self.selected = (self.selected % N)+ 1
+  elseif key == 'up' then
+    self.selected = ((self.selected - 2)% N) + 1 
   elseif key == 'return' then
     self:exec(self.selected)
   end
