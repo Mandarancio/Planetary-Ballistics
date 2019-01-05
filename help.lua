@@ -10,6 +10,10 @@ function Help.new(help)
   m.fw = bigFont:getWidth("< ESC")
   m.x = 20
   m.y = 20
+  m.bg =love.graphics.newImage("bg_tail.png")
+  m.bg:setWrap("repeat", "repeat")
+  m.quad = love.graphics.newQuad(-8*screen.w, -8*screen.h, 16*screen.w,16*screen.h, m.bg:getWidth(), m.bg:getHeight())
+
   return m
 end
 
@@ -19,6 +23,8 @@ end
 function Help:draw()
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.rectangle('fill', 0, 0,screen.w, screen.h)
+  love.graphics.setColor(0.5, 1, 0.5, 1)
+  love.graphics.draw(self.bg,self.quad,-screen.w*8,-screen.h*8)
   love.graphics.setFont(bigFont)
   love.graphics.setColor(0, 1, 0, 1)
   local fh = bigFont:getHeight()

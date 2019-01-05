@@ -21,6 +21,10 @@ function Menu.new()
     m.r = m.r + p
   end
   m.r = m.r / #m.bodies
+  m.bg =love.graphics.newImage("bg_tail.png")
+  m.bg:setWrap("repeat", "repeat")
+  m.quad = love.graphics.newQuad(-8*screen.w, -8*screen.h, 16*screen.w,16*screen.h, m.bg:getWidth(), m.bg:getHeight())
+
   return m
 end
 
@@ -43,7 +47,7 @@ function Menu:update(dt)
 --      v1 = v1 + a12 * dt
 --      v2 = v2 + a21 * dt
 --      x1 = x1 + v1 * dt
---      x2 = x2 + v2 * dt
+--      x2 = x2 + v2 * dt 
 --      b2[1] = x2
 --      b2[2] = v2
 --    end
@@ -57,7 +61,10 @@ end
 function Menu:draw()
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.rectangle('fill', 0, 0,screen.w, screen.h)
-  
+  love.graphics.setColor(0.5, 1, 0.5, 1)
+
+  love.graphics.draw(self.bg,self.quad,-screen.w*8,-screen.h*8)
+
   cx = screen.w / 2 - self.r.x
   cy = screen.h / 2 + 50 - self.r.y
   love.graphics.push()
@@ -67,9 +74,6 @@ function Menu:draw()
   --   love.graphics.points(b[1].x, b[1].y)
   -- end
   love.graphics.pop()
-  love.graphics.setColor(0, 0, 0, 0.3)
-
-  love.graphics.rectangle('fill', 0, 0,screen.w, screen.h)
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.draw(self.logo,0,0)
   love.graphics.setColor(0, 1, 0, 1)
