@@ -197,10 +197,12 @@ function Phys:collision_manager(a,b,d, to_remove, to_add)
       if (atype==btype and atype==DeadPlanet) then
         a:impact(b)
         b:impact(a)
-        a.speed = 0.9*(a.speed)+Vec2D.rand(a.speed:mod()/10)-(b.speed*b.mass-a.speed*a.mass)*0.5/(a.mass+b.mass)
-        b.speed = 0.9*(b.speed)+Vec2D.rand(b.speed:mod()/10)+(b.speed*b.mass-a.speed*a.mass)*0.5/(a.mass+b.mass)
-        a.position = a.position+a.speed*0.2
-        b.position = b.position+b.speed*0.2
+        local momentum = ( a.speed * a.mass +  b.speed*b.mass)
+        
+        a.speed = -1*(momentum*(a.mass/(a.mass+b.mass)))/a.mass
+        b.speed = 1*(momentum*(b.mass/(a.mass+b.mass)))/b.mass
+        a.position = a.position+a.speed*0.5
+        b.position = b.position+b.speed*0.5
       else
         to_remove[#to_remove+1] = a
         to_remove[#to_remove+1] = b
