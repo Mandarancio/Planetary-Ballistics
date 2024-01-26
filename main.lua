@@ -1,104 +1,89 @@
-
 require("utils")
 require("game")
 require("menu")
 require("enum")
 require("help")
 
-screen ={
-  w=0,
-  h=0,
-  cx = 0,
-  cy = 0
+PBGame = {
+  screen = {
+    w = 0,
+    h = 0,
+    cx = 0,
+    cy = 0
+  },
+
+  status = enum({ "menu", "game", "help" }),
+  bigFont = love.graphics.newFont("whitrabt.ttf", 18),
+  smallFont = love.graphics.newFont("whitrabt.ttf", 16),
+  game = nil,
+  help = nil,
+  menu = nil,
+  inGame = nil,
 }
 
-status = enum({"menu", "game", "help"})
-bigFont = love.graphics.newFont("whitrabt.ttf",18)
-smallFont = love.graphics.newFont("whitrabt.ttf",16)
-game = nil
-help = nil
-menu = nil
-in_game = status.menu
-
-function shallowcopy(orig)
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        copy = {}
-        for orig_key, orig_value in pairs(orig) do
-            copy[orig_key] = orig_value
-        end
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
-end
-
-
 function love.load()
-  math.randomseed( os.time() )
-  love.window.setTitle( "Orbital Ballistics" )
+  math.randomseed(os.time())
+  love.window.setTitle("Orbital Ballistics")
 
-  screen.w = love.graphics.getWidth()
-  screen.h = love.graphics.getHeight()
-  screen.cx = screen.w/2
-  screen.cy = screen.h/2
-  menu = Menu.new()
-  help = Help.new({{"ESC", "Pause game"}, {"TAB","Change planet"}, {"I", "Zoom In"}, {"O", "Zoom Out"}})
---  game = Game.new("Player",2,3,true)
+  PBGame.screen.w = love.graphics.getWidth()
+  PBGame.screen.h = love.graphics.getHeight()
+  PBGame.screen.cx = PBGame.screen.w / 2
+  PBGame.screen.cy = PBGame.screen.h / 2
+  PBGame.menu = Menu.new()
+  PBGame.help = Help.new({ { "ESC", "Pause game" }, { "TAB", "Change planet" }, { "I", "Zoom In" }, { "O", "Zoom Out" } })
+  PBGame.game = Game.new("Player", 2, 3, true)
+  PBGame.inGame = PBGame.status.menu
 end
-
-
 
 function love.draw()
-  if in_game == status.game then
-    game:draw()
-  elseif in_game == status.menu then
-    menu:draw()
-  elseif in_game == status.help then
-    help:draw()
+  if PBGame.inGame == PBGame.status.game then
+    PBGame.game:draw()
+  elseif PBGame.inGame == PBGame.status.menu then
+    PBGame.menu:draw()
+  elseif PBGame.inGame == PBGame.status.help then
+    PBGame.help:draw()
   end
 end
 
 function love.update(dt)
-  if in_game == status.game then
-    game:update(dt)
-  elseif in_game == status.menu then
-    menu:update(dt)
+  if PBGame.inGame == PBGame.status.game then
+    PBGame.game:update(dt)
+  elseif PBGame.inGame == PBGame.status.menu then
+    PBGame.menu:update(dt)
   end
 end
 
-function love.mousepressed(x, y, button, isTouch)
-  if in_game == status.game then
-    game:mousepressed(x, y, button)
-  elseif in_game == status.menu then
-    menu:mousepressed(x, y, button)
-  elseif in_game == status.help then
-    help:mousepressed(x, y, button)
+function love.mousepressed(x, y, button, _)
+  if PBGame.inGame == PBGame.status.game then
+    PBGame.game:mousepressed(x, y, button)
+  elseif PBGame.inGame == PBGame.status.menu then
+    PBGame.menu:mousepressed(x, y, button)
+  elseif PBGame.inGame == PBGame.status.help then
+    PBGame.help:mousepressed(x, y, button)
   end
 end
 
-function love.mousemoved(x, y, dx, dy)
-  if in_game == status.game then
-    game:mousemoved(x,y)
+function love.mousemoved(x, y, _, _)
+  if PBGame.inGame == PBGame.status.game then
+    PBGame.game:mousemoved(x, y)
   end
 end
 
-function love.mousereleased(x, y, button, isTouch)
-  if in_game == status.game then
-    game:mousereleased(x,y, button)
+function love.mousereleased(x, y, button, _)
+  if PBGame.inGame == PBGame.status.game then
+    PBGame.game:mousereleased(x, y, button)
   end
 end
 
-function love.keypressed(key, scancode, isrepeat)
-  if in_game == status.game then
-    game:keypressed(key)
-  elseif in_game == status.menu then
-    menu:keypressed(key)
-  elseif in_game == status.help then
-    help:keypressed(key)
+function love.keypressed(key, _, _)
+  if PBGame.inGame == PBGame.status.game then
+    PBGame.game:keypressed(key)
+  elseif PBGame.inGame == PBGame.status.menu then
+    PBGame.menu:keypressed(key)
+  elseif PBGame.inGame == PBGame.status.help then
+    PBGame.help:keypressed(key)
   end
 end
 
-function love.keyreleased(key)
+function love.keyreleased(_)
 end

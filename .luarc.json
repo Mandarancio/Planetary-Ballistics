@@ -1,0 +1,7 @@
+{
+  "workspace": {
+    "library": [
+      "/usr/lib/lua-language-server/meta/3rd/love2d"
+    ]
+  }
+}
